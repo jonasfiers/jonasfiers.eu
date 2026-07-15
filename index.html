@@ -195,10 +195,47 @@
 
   /* SPLITTY featured card */
   .splitty-card{
+    position:relative;
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:14px;
     padding:28px 30px;
+  }
+  .splitty-cat-peek{
+    position:absolute;
+    top:-16px;
+    right:22px;
+    width:50px;
+    height:18px;
+    overflow:hidden;
+    transition:height 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    z-index:2;
+  }
+  .splitty-cat-peek:hover{height:58px;}
+  .splitty-cat{display:block;width:50px;height:50px;overflow:visible;}
+  .splitty-cat .cat-eye-group{
+    animation:cat-blink 5s ease-in-out infinite;
+    transform-box:fill-box;
+    transform-origin:center;
+  }
+  .splitty-cat .cat-ear-left{transform-box:fill-box;transform-origin:bottom center;}
+  .splitty-cat .cat-ear-right{
+    animation:cat-ear-twitch 9s ease-in-out infinite;
+    transform-box:fill-box;
+    transform-origin:bottom center;
+  }
+  .splitty-cat .cat-body{transform-box:fill-box;transform-origin:center;}
+  @keyframes cat-blink{0%,82%,100%{transform:scaleY(1);}88%{transform:scaleY(0.07);}}
+  @keyframes cat-ear-twitch{0%,65%,100%{transform:rotate(0deg);}70%{transform:rotate(-10deg);}76%{transform:rotate(4deg);}82%{transform:rotate(0deg);}}
+  .splitty-cat-peek:hover .splitty-cat .cat-body{animation:cat-body-bounce 0.7s ease-out;}
+  .splitty-cat-peek:hover .splitty-cat .cat-ear-left{animation:cat-ear-perk-left 0.7s ease-out;}
+  .splitty-cat-peek:hover .splitty-cat .cat-ear-right{animation:cat-ear-perk-right 0.7s ease-out;}
+  @keyframes cat-body-bounce{0%{transform:scale(1);}28%{transform:scale(1.09);}52%{transform:scale(0.96);}72%{transform:scale(1.03);}100%{transform:scale(1);}}
+  @keyframes cat-ear-perk-left{0%,100%{transform:rotate(0deg);}28%{transform:rotate(14deg);}}
+  @keyframes cat-ear-perk-right{0%,100%{transform:rotate(0deg);}28%{transform:rotate(-14deg);}}
+  @media (prefers-reduced-motion: reduce){
+    .splitty-cat *{animation:none !important;}
+    .splitty-cat-peek{transition:none;}
   }
   .splitty-card .cypher{color:var(--coral);}
   .splitty-card h3{font-family:var(--display);font-size:22px;margin:0 0 10px;}
@@ -361,6 +398,34 @@
   <div class="wrap">
     <h2>Personal project</h2>
     <div class="splitty-card">
+      <div class="splitty-cat-peek">
+        <svg class="splitty-cat" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <g class="cat-body">
+            <g class="cat-ear-left">
+              <polygon points="10,18 14,8 20,18" fill="#F5A623"/>
+              <polygon points="12,17 14,10 18,17" fill="#F07167"/>
+            </g>
+            <g class="cat-ear-right">
+              <polygon points="28,18 34,8 38,18" fill="#F5A623"/>
+              <polygon points="30,17 34,10 36,17" fill="#F07167"/>
+            </g>
+            <circle cx="24" cy="28" r="16" fill="#F5A623"/>
+            <g class="cat-eye-group">
+              <ellipse cx="19" cy="27" rx="2.5" ry="3" fill="#2C1A0E"/>
+              <circle cx="20" cy="26" r="0.9" fill="white"/>
+            </g>
+            <g class="cat-eye-group">
+              <ellipse cx="29" cy="27" rx="2.5" ry="3" fill="#2C1A0E"/>
+              <circle cx="30" cy="26" r="0.9" fill="white"/>
+            </g>
+            <ellipse cx="24" cy="32" rx="1.5" ry="1.1" fill="#F07167"/>
+            <line x1="8" y1="30" x2="19" y2="32" stroke="#2C1A0E" stroke-width="0.7" opacity="0.4"/>
+            <line x1="8" y1="33" x2="19" y2="33" stroke="#2C1A0E" stroke-width="0.7" opacity="0.4"/>
+            <line x1="29" y1="32" x2="40" y2="30" stroke="#2C1A0E" stroke-width="0.7" opacity="0.4"/>
+            <line x1="29" y1="33" x2="40" y2="33" stroke="#2C1A0E" stroke-width="0.7" opacity="0.4"/>
+          </g>
+        </svg>
+      </div>
       <span class="cypher">(:Jonas)-[:BUILT]-&gt;(:Splitty)</span>
       <h3>Splitty</h3>
       <p>My answer to "who owes who" after one too many group trips. A Splitwise-style app I built mostly to get properly hands-on with graph data modeling &mdash; who paid, who owes, who settled, all mapped as a graph in Neo4j, with a Node.js API and React frontend. Self-hosted, naturally.</p>
