@@ -203,6 +203,16 @@
   .splitty-card .cypher{color:var(--coral);}
   .splitty-card h3{font-family:var(--display);font-size:22px;margin:0 0 10px;}
   .splitty-card p{color:var(--text-dim);margin:0 0 18px;font-size:15.5px;}
+  .splitty-graph{margin:22px 0 8px;}
+  .splitty-graph svg{display:block;width:100%;max-width:280px;height:auto;margin:0 auto;}
+  .flow-edge{stroke-dasharray:5 5;animation:splitty-flow 1s linear infinite;}
+  .flow-edge.delay-1{animation-delay:0.4s;}
+  .flow-edge.delay-2{animation-delay:0.7s;}
+  @keyframes splitty-flow{to{stroke-dashoffset:-10;}}
+  @media (prefers-reduced-motion: reduce){
+    .flow-edge{animation:none;}
+  }
+  .splitty-query{font-family:var(--mono);font-size:12.5px;color:var(--text-dim);margin:0 0 18px;opacity:0.85;}
   .splitty-link{
     display:inline-flex;
     align-items:center;
@@ -354,6 +364,46 @@
       <span class="cypher">(:Jonas)-[:BUILT]-&gt;(:Splitty)</span>
       <h3>Splitty</h3>
       <p>My answer to "who owes who" after one too many group trips. A Splitwise-style app I built mostly to get properly hands-on with graph data modeling &mdash; who paid, who owes, who settled, all mapped as a graph in Neo4j, with a Node.js API and React frontend. Self-hosted, naturally.</p>
+
+      <div class="splitty-graph">
+        <svg viewBox="0 0 300 365" role="img">
+          <title>Splitty's actual data shape: You paid for an Expense, "Cabin weekend" for €96, which is owed by Mila (€32) and Theo (€40). Balances are derived from these PAID and OWED_BY relationships, not stored directly between people.</title>
+          <defs>
+            <marker id="arrow-lime" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--lime)"/>
+            </marker>
+          </defs>
+
+          <path class="flow-edge" d="M150,68 Q162,97 150,127" fill="none" stroke="var(--lime)" stroke-width="1.6" marker-end="url(#arrow-lime)"/>
+          <path class="flow-edge delay-1" d="M128,215 Q85,256 74,314" fill="none" stroke="var(--lime)" stroke-width="1.6" marker-end="url(#arrow-lime)"/>
+          <path class="flow-edge delay-2" d="M172,215 Q215,256 226,314" fill="none" stroke="var(--lime)" stroke-width="1.6" marker-end="url(#arrow-lime)"/>
+
+          <rect x="134" y="88" width="44" height="18" rx="5" fill="var(--surface)"/>
+          <text x="156" y="101" text-anchor="middle" font-family="var(--mono)" font-size="12" fill="var(--text-dim)">PAID</text>
+
+          <rect x="48" y="251" width="90" height="18" rx="5" fill="var(--surface)"/>
+          <text x="93" y="264" text-anchor="middle" font-family="var(--mono)" font-size="12" fill="var(--text-dim)">OWED_BY &#8364;32</text>
+
+          <rect x="162" y="251" width="90" height="18" rx="5" fill="var(--surface)"/>
+          <text x="207" y="264" text-anchor="middle" font-family="var(--mono)" font-size="12" fill="var(--text-dim)">OWED_BY &#8364;40</text>
+
+          <circle cx="150" cy="175" r="46" fill="var(--surface)" stroke="var(--lime)" stroke-width="1.6"/>
+          <text x="150" y="162" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="var(--text-dim)">Cabin</text>
+          <text x="150" y="176" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="var(--text-dim)">weekend</text>
+          <text x="150" y="198" text-anchor="middle" font-family="var(--mono)" font-size="17" fill="var(--lime)">&#8364;96</text>
+
+          <circle cx="150" cy="48" r="18" fill="var(--coral)"/>
+          <text x="150" y="53" text-anchor="middle" font-family="var(--mono)" font-size="12" fill="var(--bg)">You</text>
+
+          <circle cx="65" cy="330" r="18" fill="var(--lime)"/>
+          <text x="65" y="335" text-anchor="middle" font-family="var(--mono)" font-size="12" fill="var(--bg)">Mila</text>
+
+          <circle cx="235" cy="330" r="18" fill="var(--lime)"/>
+          <text x="235" y="335" text-anchor="middle" font-family="var(--mono)" font-size="12" fill="var(--bg)">Theo</text>
+        </svg>
+        <p class="splitty-query">MATCH (payer:User)-[:PAID]-&gt;(e:Expense)-[o:OWED_BY]-&gt;(u:User) RETURN payer, e, o, u</p>
+      </div>
+
       <a class="splitty-link" href="https://splitty.jonasfiers.eu" target="_blank" rel="noopener">splitty.jonasfiers.eu &rarr;</a>
     </div>
   </div>
