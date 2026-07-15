@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OG image source</title>
+<style>
+  @font-face{
+    font-family:'Cabinet Grotesk';
+    src:url('fonts/CabinetGrotesk-Variable.woff2') format('woff2-variations');
+    font-weight:300 900; font-style:normal;
+  }
+  @font-face{
+    font-family:'Satoshi';
+    src:url('fonts/Satoshi-Variable.woff2') format('woff2-variations');
+    font-weight:300 900; font-style:normal;
+  }
+  @font-face{
+    font-family:'JetBrains Mono';
+    src:url('fonts/JetBrainsMono-Medium.woff2') format('woff2');
+    font-weight:500; font-style:normal;
+  }
+  :root{
+    --bg:#12172B;
+    --text:#EDEFF7;
+    --text-dim:#9AA3C0;
+    --lime:#C6F135;
+    --coral:#FF6F59;
+    --mono:'JetBrains Mono', monospace;
+    --sans:'Satoshi', sans-serif;
+    --display:'Cabinet Grotesk', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1200px;height:630px;overflow:hidden;background:var(--bg);}
+  body{position:relative;font-family:var(--sans);}
+
+  .network{position:absolute;inset:0;width:1200px;height:630px;}
+
+  .vignette{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 900px 630px at 30% 45%, rgba(18,23,43,0.94) 0%, rgba(18,23,43,0.72) 45%, rgba(18,23,43,0.28) 78%, rgba(18,23,43,0) 100%);
+  }
+
+  .content{position:absolute;left:80px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;max-width:760px;}
+
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:20px;
+    color:var(--lime);
+    margin-bottom:22px;
+    letter-spacing:0.01em;
+  }
+  h1{
+    font-family:var(--display);
+    font-size:96px;
+    font-weight:700;
+    color:var(--text);
+    line-height:1;
+    margin-bottom:14px;
+  }
+  .role{
+    font-family:var(--display);
+    font-size:32px;
+    font-weight:500;
+    color:var(--text-dim);
+    margin-bottom:26px;
+  }
+  .tagline{
+    font-size:26px;
+    color:var(--text-dim);
+    max-width:620px;
+    line-height:1.45;
+  }
+
+  .sig{
+    position:absolute;
+    right:44px;
+    bottom:36px;
+    font-family:var(--mono);
+    font-size:18px;
+    color:var(--text-dim);
+    letter-spacing:0.02em;
+  }
+</style>
+</head>
+<body>
+
+<svg class="network" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#C6F135" stroke-width="1.2" fill="none">
+    <line x1="120" y1="80" x2="260" y2="150" opacity="0.22"/>
+    <line x1="260" y1="150" x2="210" y2="280" opacity="0.20"/>
+    <line x1="210" y1="280" x2="340" y2="340" opacity="0.24"/>
+    <line x1="120" y1="80" x2="60" y2="220" opacity="0.16"/>
+    <line x1="60" y1="220" x2="210" y2="280" opacity="0.16"/>
+    <line x1="340" y1="340" x2="470" y2="300" opacity="0.22"/>
+    <line x1="470" y1="300" x2="560" y2="410" opacity="0.24"/>
+    <line x1="340" y1="340" x2="420" y2="470" opacity="0.18"/>
+    <line x1="420" y1="470" x2="560" y2="410" opacity="0.18"/>
+    <line x1="420" y1="470" x2="330" y2="560" opacity="0.16"/>
+    <line x1="560" y1="410" x2="690" y2="470" opacity="0.26"/>
+    <line x1="690" y1="470" x2="800" y2="400" opacity="0.28"/>
+    <line x1="800" y1="400" x2="770" y2="270" opacity="0.30"/>
+    <line x1="770" y1="270" x2="900" y2="200" opacity="0.32"/>
+    <line x1="900" y1="200" x2="1040" y2="240" opacity="0.30"/>
+    <line x1="900" y1="200" x2="960" y2="90" opacity="0.26"/>
+    <line x1="960" y1="90" x2="1110" y2="120" opacity="0.22"/>
+    <line x1="1040" y1="240" x2="1150" y2="310" opacity="0.24"/>
+    <line x1="1040" y1="240" x2="990" y2="360" opacity="0.22"/>
+    <line x1="990" y1="360" x2="1100" y2="440" opacity="0.20"/>
+    <line x1="800" y1="400" x2="900" y2="200" opacity="0.14"/>
+    <line x1="690" y1="470" x2="720" y2="590" opacity="0.16"/>
+    <line x1="470" y1="300" x2="600" y2="200" opacity="0.14"/>
+    <line x1="600" y1="200" x2="770" y2="270" opacity="0.16"/>
+  </g>
+  <g fill="#C6F135">
+    <circle cx="120" cy="80" r="3.4" opacity="0.5"/>
+    <circle cx="260" cy="150" r="3" opacity="0.45"/>
+    <circle cx="210" cy="280" r="3.6" opacity="0.5"/>
+    <circle cx="60" cy="220" r="2.6" opacity="0.4"/>
+    <circle cx="340" cy="340" r="4" opacity="0.55"/>
+    <circle cx="470" cy="300" r="3.2" opacity="0.5"/>
+    <circle cx="420" cy="470" r="3" opacity="0.45"/>
+    <circle cx="330" cy="560" r="2.6" opacity="0.35"/>
+    <circle cx="600" cy="200" r="2.8" opacity="0.4"/>
+    <circle cx="560" cy="410" r="4.2" opacity="0.6"/>
+    <circle cx="690" cy="470" r="4" opacity="0.65"/>
+    <circle cx="800" cy="400" r="4.4" opacity="0.7"/>
+    <circle cx="770" cy="270" r="4" opacity="0.65"/>
+    <circle cx="900" cy="200" r="4.6" opacity="0.75"/>
+    <circle cx="960" cy="90" r="3.4" opacity="0.55"/>
+    <circle cx="1110" cy="120" r="3" opacity="0.45"/>
+    <circle cx="1040" cy="240" r="4.2" opacity="0.7"/>
+    <circle cx="1150" cy="310" r="3" opacity="0.45"/>
+    <circle cx="990" cy="360" r="3.6" opacity="0.55"/>
+    <circle cx="1100" cy="440" r="3" opacity="0.45"/>
+    <circle cx="720" cy="590" r="2.8" opacity="0.4"/>
+  </g>
+  <circle cx="800" cy="400" r="6" fill="#FF6F59" opacity="0.9"/>
+</svg>
+
+<div class="vignette"></div>
+
+<div class="content">
+  <div class="eyebrow">(:Jonas)-[:IS_A]-&gt;(:SoftwareEngineer)</div>
+  <h1>Jonas Fiers</h1>
+  <div class="role">Software Engineer &middot; Ghent, Belgium</div>
+  <div class="tagline">I turn tangled, high-stakes processes into things that just work.</div>
+</div>
+
+<div class="sig">jonasfiers.eu</div>
+
+</body>
+</html>

@@ -7,6 +7,7 @@
 <meta name="description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during a food safety crisis.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.jonasfiers.eu">
+<link rel="canonical" href="https://www.jonasfiers.eu/">
 <meta property="og:title" content="Jonas Fiers — Software Engineer">
 <meta property="og:description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during a food safety crisis.">
 <meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
@@ -17,6 +18,9 @@
 <meta name="twitter:description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during a food safety crisis.">
 <meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preload" href="fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>
   @font-face{
     font-family:'Cabinet Grotesk';
@@ -266,9 +270,6 @@
     .grid-two{grid-template-columns:1fr;}
     section{padding:52px 0;}
   }
-  @media (prefers-reduced-motion: reduce){
-    #graph-canvas{display:none;}
-  }
 </style>
 <script type="application/ld+json">
 {
@@ -298,7 +299,7 @@
 <body>
 
 <section class="hero">
-  <canvas id="graph-canvas"></canvas>
+  <canvas id="graph-canvas" aria-hidden="true" role="presentation"></canvas>
   <div class="wrap hero-content">
     <p class="eyebrow">(:Jonas)-[:IS_A]-&gt;(:SoftwareEngineer)</p>
     <h1>Jonas Fiers</h1>
