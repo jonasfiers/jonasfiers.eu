@@ -468,7 +468,14 @@
   }
   if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     resize(); initNodes(); tick();
-    window.addEventListener('resize', ()=>{resize(); initNodes();});
+    let lastW = w;
+    window.addEventListener('resize', ()=>{
+      // mobile browsers fire resize when the address bar collapses on scroll,
+      // changing height only — ignore those so nodes don't jump/regenerate
+      if(canvas.parentElement.clientWidth === lastW) return;
+      resize(); initNodes();
+      lastW = w;
+    });
   }
 </script>
 
