@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jonas Fiers — Software Engineer in Ghent, Belgium</title>
-<meta name="description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during a food safety crisis.">
+<meta name="description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during the 2022 chocolate-industry salmonella crisis.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.jonasfiers.eu">
 <link rel="canonical" href="https://www.jonasfiers.eu/">
 <meta property="og:title" content="Jonas Fiers — Software Engineer">
-<meta property="og:description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during a food safety crisis.">
+<meta property="og:description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during the 2022 chocolate-industry salmonella crisis.">
 <meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Jonas Fiers — Software Engineer">
-<meta name="twitter:description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during a food safety crisis.">
+<meta name="twitter:description" content="Software engineer in Ghent building enterprise platforms in OutSystems and Neo4j — from secure claims forms to a traceability system that saved millions during the 2022 chocolate-industry salmonella crisis.">
 <meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preload" href="fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
@@ -128,8 +128,8 @@
     font-weight:600;
   }
   .about p{font-size:18px;color:var(--text);max-width:620px;}
-  .stats{display:flex;flex-wrap:wrap;gap:32px;margin-top:36px;}
-  .stat{flex:1 1 170px;max-width:230px;}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:32px 40px;margin-top:36px;}
+  .stat{max-width:none;}
   .stat .num{font-family:var(--display);font-size:34px;font-weight:700;color:var(--lime);line-height:1;margin-bottom:8px;}
   .stat .label{font-size:14px;color:var(--text-dim);line-height:1.45;}
 
@@ -377,6 +377,7 @@
   .contact-links a:hover{text-decoration:underline;}
 
   @media(max-width:640px){
+    .stats{grid-template-columns:1fr;}
     .grid-two{grid-template-columns:1fr;}
     section{padding:52px 0;}
     .splitty-card, .catalog74-card{padding:24px 20px;}
@@ -439,8 +440,12 @@
         <div class="label">API calls for the payment page &mdash; used to be 5 per payment shown, now always 1</div>
       </div>
       <div class="stat">
-        <div class="num">&euro; Millions</div>
-        <div class="label">saved during a food-safety crisis, insurance savings still rolling in</div>
+        <div class="num">Zero</div>
+        <div class="label">weeks of downtime during the 2022 chocolate-industry salmonella crisis &mdash; the affected competitor was down for 6</div>
+      </div>
+      <div class="stat">
+        <div class="num">10</div>
+        <div class="label">OutSystems certifications &amp; specializations, from Associate Developer up to Expert Developer</div>
       </div>
     </div>
   </div>
@@ -454,18 +459,18 @@
       <span class="cypher">(:Jonas)-[:WORKS_AT {since:"2024-09"}]-&gt;(:CM)</span>
       <h3>Software Engineer &mdash; CM (Christelijke Mutualiteit)</h3>
       <p class="meta">Sept 2024 &ndash; Present · Brussels, Belgium</p>
-      <div class="project-node"><b>Form editing platform</b> &mdash; gave business teams a no-code way to build secure claims forms that pull in external data automatically and hand submissions straight to the people who process them. No more waiting on a developer for every tweak.</div>
-      <div class="project-node"><b>Reimbursements visualization</b> &mdash; shoved 10x more data into the member view, stretched the visible history from 2 years to 3, and somehow made it load 50% faster. Everyone wins.</div>
-      <div class="project-node"><b>Payment visualization rework</b> &mdash; took a page that made 5 API calls per payment and got it down to 1 for the whole thing. The backend sends its thanks.</div>
+      <div class="project-node"><b>Form editing platform</b> &mdash; built in OutSystems, giving business teams a no-code way to build secure claims forms that pull in external data automatically and hand submissions straight to the people who process them. No more waiting on a developer for every tweak.</div>
+      <div class="project-node"><b>Reimbursements visualization</b> &mdash; an OutSystems screen that shoved 10x more data into the member view, stretched the visible history from 2 years to 3, and somehow made it load 50% faster. Everyone wins.</div>
+      <div class="project-node"><b>Payment visualization rework</b> &mdash; reworked in OutSystems, taking a page that made 5 API calls per payment and got it down to 1 for the whole thing. The backend sends its thanks.</div>
     </div>
 
     <div class="job">
       <span class="cypher">(:Jonas)-[:WORKED_AT {"2020-07":"2024-07"}]-&gt;(:FrontierOutSystems)</span>
       <h3>OutSystems and Neo4j Consultant &mdash; Frontier OutSystems</h3>
       <p class="meta">Jul 2020 &ndash; Jul 2024 · Brussels, Belgium</p>
-      <div class="project-node"><b>Traceability reporting platform</b> &mdash; built a Neo4j-powered app that cracked open a bottleneck nobody had managed to fix in ten years &mdash; right as a food safety crisis made it urgent. Saved the company millions, with the insurance savings still rolling in.</div>
-      <div class="project-node"><b>Experiment comparison platform</b> &mdash; gave research teams a proper way to line up experiment runs side by side instead of digging through spreadsheets.</div>
-      <div class="project-node"><b>Market share reporting tool</b> &mdash; built the in-house dashboard leadership used to keep tabs on global market share and sales.</div>
+      <div class="project-node"><b>Traceability reporting platform</b> &mdash; built in OutSystems with a Neo4j graph engine underneath, cracking open a bottleneck nobody had managed to fix in ten years &mdash; right as the 2022 chocolate-industry salmonella crisis made it urgent. Kept the production line running with zero downtime, while the affected competitor was shut down for 6 weeks &mdash; saving the company millions, with insurance savings still rolling in.</div>
+      <div class="project-node"><b>Experiment comparison platform</b> &mdash; an OutSystems app that gave research teams a proper way to line up experiment runs side by side instead of digging through spreadsheets.</div>
+      <div class="project-node"><b>Market share reporting tool</b> &mdash; the in-house OutSystems dashboard leadership used to keep tabs on global market share and sales.</div>
     </div>
 
     <div class="job">
@@ -596,11 +601,13 @@ READY
       <div class="list-item"><span class="label">2009 &ndash; 2012</span>Arteveldehogeschool &mdash; Journalism</div>
       <div class="list-item"><span class="label">2002 &ndash; 2009</span>OLVP-Lokeren &mdash; Accounting and Computer Science</div>
       <div class="list-item">
-        <span class="label">OutSystems certifications</span>
-        Expert OutSystems Developer<br>
-        Security Specialist<br>
+        <span class="label">OutSystems certifications &amp; specializations (10)</span>
+        Expert Developer<br>
         Architecture Specialist<br>
+        Security Specialist<br>
+        Front-end Developer Specialist<br>
         Mobile Developer Specialist<br>
+        Web Developer Specialist<br>
         <a href="https://www.outsystems.com/profile/zbgarzwij8/learn?trk=public_profile_see-credential" target="_blank" rel="noopener" style="color:var(--lime);">view credentials &rarr;</a>
       </div>
       <div class="list-item">
