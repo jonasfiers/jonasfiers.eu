@@ -269,6 +269,65 @@
   }
   .splitty-link:hover{background:var(--coral);color:var(--bg);}
 
+  /* Stack of personal-project cards */
+  .project-cards{display:flex;flex-direction:column;gap:32px;}
+
+  /* CATALOG-74 card */
+  .catalog74-card{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:28px 30px;
+  }
+  .catalog74-card .cypher{color:#4AF626;}
+  .catalog74-card h3{font-family:var(--display);font-size:22px;margin:0 0 10px;}
+  .c74-glyph{font-family:var(--mono);color:#4AF626;}
+  .catalog74-card p{color:var(--text-dim);margin:0 0 18px;font-size:15.5px;}
+  .c74-terminal{
+    background:#06120A;
+    border:1px solid #1B3A20;
+    border-radius:10px;
+    padding:16px 18px;
+    margin:22px 0 18px;
+    overflow-x:auto;
+  }
+  .c74-terminal pre{
+    margin:0;
+    font-family:var(--mono);
+    font-size:12.5px;
+    line-height:1.7;
+    color:#4AF626;
+    white-space:pre;
+  }
+  .c74-terminal .dim{color:#2E9E1A;}
+  .c74-cursor{
+    display:inline-block;
+    width:7px;
+    height:13px;
+    background:#4AF626;
+    vertical-align:-2px;
+    animation:c74-blink 1s step-end infinite;
+  }
+  @keyframes c74-blink{0%,100%{opacity:1;}50%{opacity:0;}}
+  @media (prefers-reduced-motion: reduce){
+    .c74-cursor{animation:none;}
+  }
+  .catalog74-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--mono);
+    font-size:14px;
+    color:#4AF626;
+    text-decoration:none;
+    border:1px solid #4AF626;
+    padding:9px 16px;
+    border-radius:8px;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .catalog74-link:hover{background:#4AF626;color:var(--bg);}
+
   .cv-link{
     display:inline-flex;
     align-items:center;
@@ -320,6 +379,9 @@
   @media(max-width:640px){
     .grid-two{grid-template-columns:1fr;}
     section{padding:52px 0;}
+    .splitty-card, .catalog74-card{padding:24px 20px;}
+    .c74-terminal{padding:14px;}
+    .c74-terminal pre{font-size:11.5px;}
   }
 </style>
 <script type="application/ld+json">
@@ -342,7 +404,8 @@
   "sameAs": [
     "https://linkedin.com/in/jonasfiers",
     "https://github.com/jonasfiers",
-    "https://splitty.jonasfiers.eu"
+    "https://splitty.jonasfiers.eu",
+    "https://catalog74.jonasfiers.eu"
   ],
   "knowsAbout": ["OutSystems", "Neo4j", "Cypher Query Language", "Low-code development", "Graph data modeling"]
 }
@@ -416,7 +479,8 @@
 
 <section class="project">
   <div class="wrap">
-    <h2>Personal project</h2>
+    <h2>Personal projects</h2>
+    <div class="project-cards">
     <div class="splitty-card">
       <div class="splitty-cat-peek">
         <svg class="splitty-cat" viewBox="0 0 48 48" fill="none" aria-hidden="true">
@@ -490,6 +554,20 @@
       </div>
 
       <a class="splitty-link" href="https://splitty.jonasfiers.eu" target="_blank" rel="noopener">splitty.jonasfiers.eu &rarr;</a>
+    </div>
+
+    <div class="catalog74-card">
+      <span class="cypher">MOVE SPLITTY TO CATALOG-74.</span>
+      <h3><span class="c74-glyph">=^.^=</span> CATALOG-74</h3>
+      <p>Splitty, sent back to 1974. Splitty derives your balance fresh on every request by traversing a live graph &mdash; nothing is ever stored. CATALOG-74 derives the same balance the way a real COBOL shop would: batch-aggregate the day's transactions and write the answer to a flat file. It is stored this time &mdash; just never more current than the last nightly run. Add an expense and the number on screen won't move until the batch says otherwise.</p>
+
+      <div class="c74-terminal"><pre>you@catalog74:~$ ./run-batch.sh
+<span class="dim">[batch] run starting</span>
+[batch] balances refreshed
+you@catalog74:~$ <span class="c74-cursor"></span></pre></div>
+
+      <a class="catalog74-link" href="https://catalog74.jonasfiers.eu" target="_blank" rel="noopener">catalog74.jonasfiers.eu &rarr;</a>
+    </div>
     </div>
   </div>
 </section>
