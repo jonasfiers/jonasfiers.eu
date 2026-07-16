@@ -561,10 +561,13 @@
       <h3><span class="c74-glyph">=^.^=</span> CATALOG-74</h3>
       <p>Splitty, sent back to 1974. Splitty derives your balance fresh on every request by traversing a live graph &mdash; nothing is ever stored. CATALOG-74 derives the same balance the way a real COBOL shop would: batch-aggregate the day's transactions and write the answer to a flat file. It is stored this time &mdash; just never more current than the last nightly run. Add an expense and the number on screen won't move until the batch says otherwise.</p>
 
-      <div class="c74-terminal"><pre>you@catalog74:~$ ./run-batch.sh
-<span class="dim">[batch] run starting</span>
-[batch] balances refreshed
-you@catalog74:~$ <span class="c74-cursor"></span></pre></div>
+      <div class="c74-terminal"><pre>READY
+SUBMIT CATALOG74.JCL(RUNBATCH)
+<span class="dim">JOB CATALOG7(JOB03142) SUBMITTED</span>
+<span class="dim">IEF403I CATALOG7 - STARTED</span>
+<span class="dim">IEF404I CATALOG7 - ENDED</span>
+READY
+<span class="c74-cursor"></span></pre></div>
 
       <a class="catalog74-link" href="https://catalog74.jonasfiers.eu" target="_blank" rel="noopener">catalog74.jonasfiers.eu &rarr;</a>
     </div>
