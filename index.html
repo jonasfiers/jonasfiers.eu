@@ -328,6 +328,36 @@
   }
   .catalog74-link:hover{background:#4AF626;color:var(--bg);}
 
+  /* PICASSO card */
+  .picasso-card{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:28px 30px;
+  }
+  .picasso-card .cypher{color:#E8437E;}
+  .picasso-card h3{font-family:var(--display);font-size:22px;margin:0 0 10px;}
+  .picasso-card p{color:var(--text-dim);margin:0 0 18px;font-size:15.5px;}
+  .picasso-canvas{margin:22px 0 18px;}
+  .picasso-canvas svg{display:block;width:100%;max-width:340px;height:auto;margin:0 auto;}
+  .picasso-byte{font-family:var(--mono);font-size:9px;fill:var(--text-dim);}
+  .picasso-swatch-label{font-family:var(--mono);font-size:9px;fill:var(--bg);}
+  .picasso-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--mono);
+    font-size:14px;
+    color:#E8437E;
+    text-decoration:none;
+    border:1px solid #E8437E;
+    padding:9px 16px;
+    border-radius:8px;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .picasso-link:hover{background:#E8437E;color:var(--bg);}
+
   .cv-link{
     display:inline-flex;
     align-items:center;
@@ -380,7 +410,7 @@
     .stats{grid-template-columns:1fr;}
     .grid-two{grid-template-columns:1fr;}
     section{padding:52px 0;}
-    .splitty-card, .catalog74-card{padding:24px 20px;}
+    .splitty-card, .catalog74-card, .picasso-card{padding:24px 20px;}
     .c74-terminal{padding:14px;}
     .c74-terminal pre{font-size:11.5px;}
   }
@@ -406,9 +436,10 @@
     "https://linkedin.com/in/jonasfiers",
     "https://github.com/jonasfiers",
     "https://splitty.jonasfiers.eu",
-    "https://catalog74.jonasfiers.eu"
+    "https://catalog74.jonasfiers.eu",
+    "https://github.com/jonasfiers/PICASSO"
   ],
-  "knowsAbout": ["OutSystems", "Neo4j", "Cypher Query Language", "Low-code development", "Graph data modeling"]
+  "knowsAbout": ["OutSystems", "Neo4j", "Cypher Query Language", "Low-code development", "Graph data modeling", "COBOL", "Legacy system integration"]
 }
 </script>
 </head>
@@ -575,6 +606,102 @@ READY
 <span class="c74-cursor"></span></pre></div>
 
       <a class="catalog74-link" href="https://catalog74.jonasfiers.eu" target="_blank" rel="noopener">catalog74.jonasfiers.eu &rarr;</a>
+    </div>
+
+    <div class="picasso-card">
+      <span class="cypher">MOVE COPYBOOK TO JSON.</span>
+      <h3>&#127912; PICASSO</h3>
+      <p>The OutSystems Forge has no COBOL connector, so every mainframe integration gets hand-rolled &mdash; someone reads the copybook's <code>PIC</code> clauses and types the byte offsets into a config file by hand. CATALOG-74's own <code>specs.js</code> is exactly that: a human worked out that <code>PIC 9(7)V99</code> occupies nine bytes starting at offset 12, and typed it in. PICASSO is the thing that should exist instead &mdash; a real Integration Studio Extension that reads the <code>.cpy</code> file and derives the layout itself. Point it at CATALOG-74's own copybooks and watch it reproduce the exact offsets a human once hand-mirrored.</p>
+
+      <div class="picasso-canvas">
+        <svg viewBox="0 0 340 200" role="img">
+          <title>PICASSO reading a fixed-width record: the same undifferentiated bytes on the left &mdash; including COMP-3 packed bytes that render as unprintable characters &mdash; are derived into four typed fields on the right: ARTIST-ID as Integer, ARTIST-NAME as Text, TOTAL-VALUE and NET-WORTH as Decimal.</title>
+          <defs>
+            <marker id="arrow-picasso" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#E8437E"/>
+            </marker>
+          </defs>
+
+          <!-- Raw fixed-width bytes: one record, no field boundaries visible. -->
+          <g>
+            <rect x="8" y="14" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="14.5" y="25.5" text-anchor="middle" class="picasso-byte">1</text>
+            <rect x="22" y="14" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="28.5" y="25.5" text-anchor="middle" class="picasso-byte">0</text>
+            <rect x="36" y="14" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="42.5" y="25.5" text-anchor="middle" class="picasso-byte">0</text>
+            <rect x="50" y="14" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="56.5" y="25.5" text-anchor="middle" class="picasso-byte">0</text>
+            <rect x="64" y="14" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="70.5" y="25.5" text-anchor="middle" class="picasso-byte">0</text>
+            <rect x="78" y="14" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="84.5" y="25.5" text-anchor="middle" class="picasso-byte">1</text>
+          </g>
+          <g>
+            <rect x="8" y="60" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="14.5" y="71.5" text-anchor="middle" class="picasso-byte">P</text>
+            <rect x="22" y="60" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="28.5" y="71.5" text-anchor="middle" class="picasso-byte">A</text>
+            <rect x="36" y="60" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="42.5" y="71.5" text-anchor="middle" class="picasso-byte">B</text>
+            <rect x="50" y="60" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="56.5" y="71.5" text-anchor="middle" class="picasso-byte">L</text>
+            <rect x="64" y="60" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="70.5" y="71.5" text-anchor="middle" class="picasso-byte">O</text>
+            <rect x="78" y="60" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="84.5" y="71.5" text-anchor="middle" class="picasso-byte">&#160;</text>
+          </g>
+          <!-- COMP-3: these bytes are not text, and a text view shows it. -->
+          <g>
+            <rect x="8" y="106" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="14.5" y="117.5" text-anchor="middle" class="picasso-byte">&#183;</text>
+            <rect x="22" y="106" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="28.5" y="117.5" text-anchor="middle" class="picasso-byte">&#183;</text>
+            <rect x="36" y="106" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="42.5" y="117.5" text-anchor="middle" class="picasso-byte">(</text>
+            <rect x="50" y="106" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="56.5" y="117.5" text-anchor="middle" class="picasso-byte">P</text>
+            <rect x="64" y="106" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="70.5" y="117.5" text-anchor="middle" class="picasso-byte">&#183;</text>
+            <rect x="78" y="106" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="84.5" y="117.5" text-anchor="middle" class="picasso-byte">&#183;</text>
+          </g>
+          <g>
+            <rect x="8" y="152" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="14.5" y="163.5" text-anchor="middle" class="picasso-byte">+</text>
+            <rect x="22" y="152" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="28.5" y="163.5" text-anchor="middle" class="picasso-byte">0</text>
+            <rect x="36" y="152" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="42.5" y="163.5" text-anchor="middle" class="picasso-byte">0</text>
+            <rect x="50" y="152" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="56.5" y="163.5" text-anchor="middle" class="picasso-byte">0</text>
+            <rect x="64" y="152" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="70.5" y="163.5" text-anchor="middle" class="picasso-byte">1</text>
+            <rect x="78" y="152" width="13" height="16" rx="2" fill="var(--bg)" stroke="var(--border)"/>
+            <text x="84.5" y="163.5" text-anchor="middle" class="picasso-byte">3</text>
+          </g>
+
+          <path class="flow-edge" d="M96,22 Q150,22 196,26" fill="none" stroke="#E8437E" stroke-width="1.6" marker-end="url(#arrow-picasso)"/>
+          <path class="flow-edge delay-1" d="M96,68 Q150,68 196,72" fill="none" stroke="#E8437E" stroke-width="1.6" marker-end="url(#arrow-picasso)"/>
+          <path class="flow-edge delay-2" d="M96,114 Q150,114 196,118" fill="none" stroke="#E8437E" stroke-width="1.6" marker-end="url(#arrow-picasso)"/>
+          <path class="flow-edge delay-1" d="M96,160 Q150,160 196,164" fill="none" stroke="#E8437E" stroke-width="1.6" marker-end="url(#arrow-picasso)"/>
+
+          <!-- Typed fields, derived. -->
+          <rect x="200" y="15" width="132" height="22" rx="6" fill="#E8437E"/>
+          <text x="208" y="30" class="picasso-swatch-label">ARTIST-ID &#183; Integer</text>
+
+          <rect x="200" y="61" width="132" height="22" rx="6" fill="var(--coral)"/>
+          <text x="208" y="76" class="picasso-swatch-label">ARTIST-NAME &#183; Text</text>
+
+          <rect x="200" y="107" width="132" height="22" rx="6" fill="#F5A623"/>
+          <text x="208" y="122" class="picasso-swatch-label">TOTAL-VALUE &#183; Decimal</text>
+
+          <rect x="200" y="153" width="132" height="22" rx="6" fill="var(--lime)"/>
+          <text x="208" y="168" class="picasso-swatch-label">NET-WORTH &#183; Decimal</text>
+        </svg>
+      </div>
+
+      <a class="picasso-link" href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO &rarr;</a>
     </div>
     </div>
   </div>
