@@ -200,14 +200,14 @@ a{color:inherit;}
   margin:0 0 18px;
   letter-spacing:0.02em;
 }
-h1{
+.home h1{
   font-family:var(--display);
   font-size:clamp(40px,7vw,72px);
   font-weight:700;
   margin:0 0 8px;
   line-height:1.05;
 }
-h1 span{color:var(--lime);}
+.home h1 span{color:var(--lime);}
 .role{
   font-family:var(--display);
   font-size:clamp(18px,2.4vw,24px);
@@ -223,9 +223,9 @@ h1 span{color:var(--lime);}
 }
 
 /* SECTIONS */
-section{padding:72px 0;border-bottom:1px solid var(--border);}
-section:last-of-type{border-bottom:none;}
-h2{
+.home section{padding:72px 0;border-bottom:1px solid var(--border);}
+.home section:last-of-type{border-bottom:none;}
+.home h2{
   font-family:var(--display);
   font-size:13px;
   text-transform:uppercase;
