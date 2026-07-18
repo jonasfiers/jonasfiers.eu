@@ -100,14 +100,14 @@ a{color:inherit;}
   gap:8px;
   font-family:var(--mono);
   font-size:14px;
-  color:var(--lime);
+  color:var(--pink);
   text-decoration:none;
-  border:1px solid var(--lime);
+  border:1px solid var(--pink);
   padding:9px 16px;
   border-radius:8px;
   transition:background 0.15s ease, color 0.15s ease;
 }
-.site-footer .back:hover{background:var(--lime);color:var(--bg);}
+.site-footer .back:hover{background:var(--pink);color:var(--bg);}
 .site-footer .fine{
   margin-top:26px;
   font-family:var(--mono);
