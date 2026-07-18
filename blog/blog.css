@@ -23,20 +23,7 @@
   font-weight:500; font-style:normal; font-display:swap;
 }
 
-:root{
-  --bg:#12172B;
-  --surface:#1B2340;
-  --surface-2:#232C52;
-  --border:#2E3760;
-  --text:#EDEFF7;
-  --text-dim:#9AA3C0;
-  --lime:#C6F135;
-  --coral:#FF6F59;
-  --pink:#E8437E;            /* PICASSO series accent */
-  --mono:'JetBrains Mono', monospace;
-  --sans:'Satoshi', sans-serif;
-  --display:'Cabinet Grotesk', sans-serif;
-}
+/* Design tokens now live in ../assets/tokens.css (linked before this file). */
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{
@@ -50,76 +37,9 @@ body{
 a{color:inherit;}
 .wrap{max-width:720px;margin:0 auto;padding:0 24px;}
 
-/* SITE HEADER — persistent, links back to the portfolio */
-.site-header{
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  z-index:10;
-  background:rgba(18,23,43,0.82);
-  backdrop-filter:blur(8px);
-}
-.site-header .wrap{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  height:60px;
-}
-.brand{
-  font-family:var(--display);
-  font-weight:700;
-  font-size:17px;
-  text-decoration:none;
-  color:var(--text);
-  letter-spacing:-0.01em;
-}
-.brand span{color:var(--pink);}
-.nav-links{
-  display:flex;
-  gap:22px;
-  font-family:var(--mono);
-  font-size:13.5px;
-}
-.nav-links a{
-  color:var(--text-dim);
-  text-decoration:none;
-  transition:color 0.15s ease, opacity 0.15s ease;
-}
-/* section colour language: portfolio = lime, writing = pink */
-.nav-links a.to-portfolio{color:var(--lime);}
-.nav-links a.to-writing{color:var(--pink);}
-.nav-links a:hover{opacity:0.72;}
-.nav-links a[aria-current="page"]{text-decoration:underline;text-underline-offset:4px;}
-
-/* FOOTER */
-.site-footer{
-  border-top:1px solid var(--border);
-  margin-top:72px;
-  padding:44px 0 60px;
-  text-align:center;
-}
-.site-footer .back{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-family:var(--mono);
-  font-size:14px;
-  text-decoration:none;
-  border:1px solid;
-  padding:9px 16px;
-  border-radius:8px;
-  transition:background 0.15s ease, color 0.15s ease;
-}
-.site-footer .back.to-writing{color:var(--pink);border-color:var(--pink);}
-.site-footer .back.to-writing:hover{background:var(--pink);color:var(--bg);}
-.site-footer .back.to-portfolio{color:var(--lime);border-color:var(--lime);}
-.site-footer .back.to-portfolio:hover{background:var(--lime);color:var(--bg);}
-.site-footer .fine{
-  margin-top:26px;
-  font-family:var(--mono);
-  font-size:12.5px;
-  color:var(--text-dim);
-}
+/* Site header + slim footer chrome now live in ../assets/chrome.css.
+   The footer's .contact-links styling stays here (page-local: the class name
+   is shared with the homepage, so it is not moved into shared chrome). */
 .site-footer .contact-links{
   display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;
   margin-top:18px;font-family:var(--mono);font-size:13.5px;
@@ -259,7 +179,7 @@ article.post hr{
 }
 
 @media(max-width:640px){
-  .nav-links{gap:16px;font-size:12.5px;}
+  /* .nav-links responsive rule moved to ../assets/chrome.css */
   article.post p{font-size:16.5px;}
   .article-head{padding:40px 0 0;}
   .code-block pre{font-size:12px;}

@@ -21,6 +21,8 @@
 <link rel="preload" href="fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/chrome.css">
 <style>
   @font-face{
     font-family:'Cabinet Grotesk';
@@ -44,19 +46,6 @@
   }
 </style>
 <style>
-  :root{
-    --bg:#12172B;
-    --surface:#1B2340;
-    --surface-2:#232C52;
-    --border:#2E3760;
-    --text:#EDEFF7;
-    --text-dim:#9AA3C0;
-    --lime:#C6F135;
-    --coral:#FF6F59;
-    --mono:'JetBrains Mono', monospace;
-    --sans:'Satoshi', sans-serif;
-    --display:'Cabinet Grotesk', sans-serif;
-  }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
@@ -463,6 +452,18 @@
 </script>
 </head>
 <body>
+
+<!-- @@header@@ -->
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">Jonas Fiers<span>.</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="to-portfolio" href="index.html" aria-current="page">Portfolio</a>
+      <a class="to-writing" href="blog/index.html">Writing</a>
+    </nav>
+  </div>
+</header>
+<!-- @@/header@@ -->
 
 <section class="hero">
   <canvas id="graph-canvas" aria-hidden="true" role="presentation"></canvas>
