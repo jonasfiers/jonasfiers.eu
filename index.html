@@ -235,7 +235,7 @@ READY
     <div class="picasso-card">
       <span class="cypher">MOVE COPYBOOK TO JSON.</span>
       <h3>&#127912; PICASSO <span class="wip">Work in progress</span></h3>
-      <p>The OutSystems Forge has no COBOL connector, so every mainframe integration gets hand-rolled &mdash; someone reads the copybook's <code>PIC</code> clauses and types the byte offsets into a config file by hand. CATALOG-74's own <code>specs.js</code> is exactly that: a human worked out that <code>PIC 9(7)V99</code> occupies nine bytes starting at offset 12, and typed it in. PICASSO is the thing that should exist instead &mdash; a real Integration Studio Extension that reads the <code>.cpy</code> file and derives the layout itself. Point it at CATALOG-74's own copybooks and watch it reproduce the exact offsets a human once hand-mirrored.</p>
+      <p>Copybook parsing is a solved problem &mdash; everywhere except inside OutSystems, whose Forge has no COBOL connector. So mainframe integrations on the platform get hand-rolled: someone reads the copybook's <code>PIC</code> clauses and types the byte offsets into a config file by hand. CATALOG-74's own <code>specs.js</code> is exactly that &mdash; a human worked out that <code>PIC 9(7)V99</code> occupies nine bytes at offset 12, and typed it in. PICASSO fills that gap natively: a .NET copybook parser, built to become an Integration Studio Extension, that derives the layout from the <code>.cpy</code> itself and is validated against a real COBOL compiler. Point it at CATALOG-74's own copybooks and watch it reproduce the exact offsets a human once hand-mirrored.</p>
 
       <div class="picasso-canvas">
         <svg viewBox="0 0 340 200" role="img">
