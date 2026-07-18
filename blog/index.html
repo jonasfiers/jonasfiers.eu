@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing — Jonas Fiers</title>
+<meta name="description" content="Essays on building enterprise software, legacy integration, and the projects I make to learn something the hard way — by Jonas Fiers, software engineer in Ghent.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.jonasfiers.eu/blog/">
+<link rel="canonical" href="https://www.jonasfiers.eu/blog/">
+<meta property="og:title" content="Writing — Jonas Fiers">
+<meta property="og:description" content="Essays on building enterprise software, legacy integration, and the projects I make to learn something the hard way.">
+<meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Writing — Jonas Fiers">
+<meta name="twitter:description" content="Essays on building enterprise software, legacy integration, and the projects I make to learn something the hard way.">
+<meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preload" href="../fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="blog.css">
+
+<!--
+  ============================================================================
+  BLOG SERIES PLAN — "PICASSO: reading a copybook so a human doesn't have to"
+  ============================================================================
+  A 5-part arc (with an optional 6th), progressing from the why, through the
+  technical substance, the philosophy, the validation, and finally the method.
+  Only post 1 is written and published. The rest are drafted here as the map.
+
+  1. The thing that should already exist                        [PUBLISHED]
+     The goal, and why I picked it. The OutSystems Forge has no COBOL
+     connector, so every mainframe integration gets hand-rolled; CATALOG-74's
+     specs.js is that hand-transcription in miniature. Nobody built the parser
+     that should exist. That's PICASSO.
+
+  2. What's actually inside a copybook
+     The anatomy of a COBOL copybook and why deriving a byte layout is fiddly:
+     PIC clauses, implied decimals, COMP-3 packed decimal, EBCDIC, sign
+     handling, OCCURS and REDEFINES. Why a human counting characters gets it
+     wrong, and why the offsets are computable.
+
+  3. Let the real files find the bugs
+     "Fail loudly, never silently miscompute." How running one genuine 1990s
+     mainframe extract (DTAR020) surfaced four gaps that no synthetic test
+     ever would — fixed-format source, EBCDIC, undelimited records, headless
+     copy member — and why a silent wrong answer is the enemy.
+
+  4. Trust, but verify — against a real compiler
+     Proving a parser three independent ways that don't reference each other:
+     a GnuCOBOL differential oracle, an independent tool's own published
+     values, and a human's hand-transcription. Plus the one deliberate
+     discrepancy (the COMP-5 dialect) and why we kept it.
+
+  5. I didn't write a line of the C#
+     The method: I identified the problem, set scope, and directed an AI
+     (Claude) to build it, validating every layout against real data. What
+     that division of labour is good at, where it needs a human holding the
+     spec, and why the honest version is more interesting than pretending.
+
+  (6, optional) The last mile is a Windows GUI
+     Packaging Picasso.Core into an Integration Studio Extension and getting
+     it to Forge — the part you can't automate, and the O11-vs-ODC question.
+  ============================================================================
+-->
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Jonas Fiers<span>.</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../index.html">Portfolio</a>
+      <a href="index.html" aria-current="page">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="index-head">
+      <p class="eyebrow">// writing</p>
+      <h1>Notes from the build</h1>
+      <p class="lede">Essays on enterprise software, legacy integration, and the side projects I make mostly as an excuse to learn something the hard way.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="post-list">
+
+      <a class="post-card" href="picasso-the-thing-that-should-exist.html">
+        <div class="kicker">
+          <span>PICASSO · Part 1</span>
+          <span class="muted">18 Jul 2026</span>
+          <span class="muted">7 min read</span>
+        </div>
+        <h2>The thing that should already exist</h2>
+        <p>The OutSystems Forge has a connector for almost everything — except COBOL. So every mainframe integration gets hand-rolled by someone reading a copybook and typing byte offsets into a config file. I got tired of watching that, and built the parser nobody had bothered to write.</p>
+      </a>
+
+      <div class="post-card upcoming" aria-disabled="true">
+        <div class="kicker">
+          <span>PICASSO · Part 2</span>
+          <span class="soon">Coming soon</span>
+        </div>
+        <h2>What's actually inside a copybook</h2>
+        <p>PIC clauses, implied decimals, packed decimal, EBCDIC, OCCURS, REDEFINES — the anatomy of a byte layout, and why a human counting characters gets it wrong.</p>
+      </div>
+
+      <div class="post-card upcoming" aria-disabled="true">
+        <div class="kicker">
+          <span>PICASSO · Part 3</span>
+          <span class="soon">Coming soon</span>
+        </div>
+        <h2>Let the real files find the bugs</h2>
+        <p>Fail loudly, never silently miscompute. How one genuine 1990s mainframe extract exposed four gaps that every synthetic test had missed.</p>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="back" href="../index.html">&larr; Back to the portfolio</a>
+    <div class="contact-links">
+      <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>
+      <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
+    </div>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) — self-hosted, no cloud provider involved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

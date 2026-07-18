@@ -357,6 +357,9 @@
     transition:background 0.15s ease, color 0.15s ease;
   }
   .picasso-link:hover{background:#E8437E;color:var(--bg);}
+  .picasso-links{display:flex;flex-wrap:wrap;gap:12px;}
+  .picasso-link.ghost{color:var(--text-dim);border-color:var(--border);}
+  .picasso-link.ghost:hover{background:var(--surface-2);color:var(--text);border-color:var(--text-dim);}
 
   .cv-link{
     display:inline-flex;
@@ -373,6 +376,22 @@
     transition:background 0.15s ease, color 0.15s ease;
   }
   .cv-link:hover{background:var(--lime);color:var(--bg);}
+  .hero-links{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;}
+  .hero-links .cv-link{margin-top:0;}
+  .writing-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--mono);
+    font-size:14px;
+    color:#E8437E;
+    text-decoration:none;
+    border:1px solid #E8437E;
+    padding:9px 16px;
+    border-radius:8px;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .writing-link:hover{background:#E8437E;color:var(--bg);}
 
   /* SKILLS as node-label pills */
   .pills{display:flex;flex-wrap:wrap;gap:10px;}
@@ -452,7 +471,10 @@
     <h1>Jonas Fiers</h1>
     <p class="role">Software Engineer · Ghent, Belgium</p>
     <p class="tagline">I turn tangled, high-stakes processes into things that just&nbsp;work.</p>
-    <a class="cv-link" href="Jonas_Fiers_CV.pdf" download>Download CV (PDF) &darr;</a>
+    <div class="hero-links">
+      <a class="cv-link" href="Jonas_Fiers_CV.pdf" download>Download CV (PDF) &darr;</a>
+      <a class="writing-link" href="blog/index.html">Read the blog &rarr;</a>
+    </div>
   </div>
 </section>
 
@@ -701,7 +723,10 @@ READY
         </svg>
       </div>
 
-      <a class="picasso-link" href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO &rarr;</a>
+      <div class="picasso-links">
+        <a class="picasso-link" href="blog/picasso-the-thing-that-should-exist.html">Why I built it &rarr;</a>
+        <a class="picasso-link ghost" href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO &rarr;</a>
+      </div>
     </div>
     </div>
   </div>

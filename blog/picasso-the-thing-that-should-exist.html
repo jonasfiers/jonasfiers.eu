@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The thing that should already exist — Jonas Fiers</title>
+<meta name="description" content="The OutSystems Forge has a connector for almost everything except COBOL, so every mainframe integration gets hand-rolled by someone typing byte offsets into a config file. Why I built PICASSO — the parser that reads the copybook and derives those offsets itself.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.jonasfiers.eu/blog/picasso-the-thing-that-should-exist.html">
+<link rel="canonical" href="https://www.jonasfiers.eu/blog/picasso-the-thing-that-should-exist.html">
+<meta property="og:title" content="The thing that should already exist">
+<meta property="og:description" content="The OutSystems Forge has no COBOL connector, so every mainframe integration gets hand-rolled. PICASSO is the parser that reads the copybook and derives the byte layout itself.">
+<meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-07-18">
+<meta property="article:author" content="Jonas Fiers">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The thing that should already exist">
+<meta name="twitter:description" content="The OutSystems Forge has no COBOL connector, so every mainframe integration gets hand-rolled. PICASSO is the parser that reads the copybook and derives the byte layout itself.">
+<meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preload" href="../fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="blog.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The thing that should already exist",
+  "description": "Why I built PICASSO — the COBOL copybook parser the OutSystems Forge never had.",
+  "datePublished": "2026-07-18",
+  "author": { "@type": "Person", "name": "Jonas Fiers", "url": "https://www.jonasfiers.eu" },
+  "image": "https://www.jonasfiers.eu/og-image.png",
+  "mainEntityOfPage": "https://www.jonasfiers.eu/blog/picasso-the-thing-that-should-exist.html",
+  "isPartOf": { "@type": "Blog", "name": "Notes from the build" }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Jonas Fiers<span>.</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../index.html">Portfolio</a>
+      <a href="index.html">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="article-head">
+      <p class="kicker">
+        <span>PICASSO · Part 1</span>
+        <span class="muted">18 Jul 2026</span>
+        <span class="muted">7 min read</span>
+      </p>
+      <h1>The thing that should already exist</h1>
+      <p class="standfirst">The OutSystems Forge has a connector for almost everything. It does not have one for COBOL — so every mainframe integration gets hand-rolled, one copybook at a time. This is the story of why I decided to build the piece that was missing.</p>
+      <p class="byline">By Jonas Fiers · first in a series on PICASSO</p>
+    </div>
+
+    <article class="post">
+
+      <p>Every mainframe integration I have watched go in starts the same way: a person, a copybook, and a ruler.</p>
+
+      <p>Someone opens a <code>.cpy</code> file — a COBOL <em>copybook</em>, the little schema that describes the exact byte layout of a fixed-width record — and starts counting. This field is nine bytes. The next one starts at offset twelve. That one is packed decimal, so it is really only five bytes on disk even though it holds nine digits. They write those numbers down in a config file somewhere, wire up a parser around them, and ship it. It works. And then someone adds a field three months later, every offset after it shifts by one, and nobody notices until the numbers on a report quietly stop adding up.</p>
+
+      <p>I know this dance well, because I did it myself. Not for a client — for a toy.</p>
+
+      <h2>A miniature of the whole problem</h2>
+
+      <p>One of my side projects, <a class="inline" href="https://catalog74.jonasfiers.eu" target="_blank" rel="noopener">CATALOG-74</a>, is a deliberately anachronistic thing: it takes a modern expense-splitting app and rebuilds it the way a 1974 COBOL shop would have — batch jobs, flat files, nightly runs. To read those flat files back out in Node.js, I had to tell my code where every field lived. So I did what everyone does. I opened the copybooks, and I transcribed them by hand:</p>
+
+      <div class="code-block">
+<pre><span class="cmt">// Field specs mirror the copybooks byte-for-byte -- see
+// cobol/copybooks/*.cpy for the authoritative PIC clauses.</span>
+const BALANCE_SPEC = [
+  { name: 'groupId',    start: 0,  len: 6, type: 'int' },
+  { name: 'userId',     start: 6,  len: 6, type: 'int' },
+  <span class="hl">{ name: 'totalPaid',  start: 12, len: 9, type: 'int' },</span>
+  { name: 'totalOwed',  start: 21, len: 9, type: 'int' },
+  { name: 'netBalance', start: 30, len: 9, type: 'int' },
+  { name: 'sign',       start: 39, len: 1, type: 'str' },
+  { name: 'asOf',       start: 40, len: 14, type: 'int' },
+]</pre>
+        <span class="cap">CATALOG-74's <code>specs.js</code>: a human read the copybook, and typed the layout back in by hand.</span>
+      </div>
+
+      <p>Look at the highlighted line. The copybook says <code>TOTAL-PAID PIC 9(7)V99</code>. To turn that into <code>{ start: 12, len: 9 }</code>, I had to know a handful of things by heart: that <code>9(7)</code> means seven digits, that the <code>V99</code> tacks on two more after an <em>implied</em> decimal point that occupies no byte of its own, that seven plus two is nine characters of DISPLAY storage — and that the field before it ended at byte 12, so this one begins there. Nine bytes, offset twelve. I counted it out, and I typed it in.</p>
+
+      <p>It works. It is also completely absurd. That line is a hand transcription of information that already exists, in precise machine-readable form, in a file sitting one directory away. I copied a number out of a document, by eye, into another document — the single most error-prone thing a programmer can do — and the original was right there the whole time, waiting to be parsed.</p>
+
+      <div class="pull">
+        <p>Nobody had written the thing that should exist: a parser that reads the actual copybook and derives those offsets itself.</p>
+      </div>
+
+      <p>That was the moment the real project announced itself. Not the expense app. The missing tool underneath it.</p>
+
+      <h2>Why the tool was missing</h2>
+
+      <p>Here is the thing that still surprises people. This is not an exotic problem. Copybooks are one of the most stable, best-documented data formats on earth — the rules for turning a <code>PIC</code> clause into a byte width have not meaningfully changed in fifty years. Mainframes still run a serious share of the world's banking, insurance, and government records. Reading their extracts is a daily task for a lot of enterprises.</p>
+
+      <p>And yet, in the <a class="inline" href="https://www.outsystems.com/forge/" target="_blank" rel="noopener">OutSystems Forge</a> — the marketplace of connectors for the low-code platform I spend most of my working life in — there is no COBOL connector. There are connectors for Salesforce, for Twilio, for a dozen databases, for services that did not exist a decade ago. For the format that predates all of them and quietly underpins half of them, there is nothing. So each team that needs to read a mainframe file reaches for the ruler and counts it out again, in isolation, reinventing the same fragile transcription their neighbours already wrote and will have to maintain forever.</p>
+
+      <p>The gap is not that the problem is hard. The gap is that nobody found it interesting enough to close properly. It is unglamorous plumbing. It is exactly the kind of thing that gets worked around one project at a time instead of solved once.</p>
+
+      <h2>What I set out to build</h2>
+
+      <p>PICASSO — <em>PICTURE Interpreter for COBOL, Assembling Structured Schemas for OutSystems</em> — is my attempt to solve it once. The goal is stated in a single sentence: point it at a <code>.cpy</code> file, and it derives the byte layout itself.</p>
+
+      <p>Not a config file you fill in by hand. Not a wizard that asks you where each field starts. You give it the copybook — the same text a mainframe compiler reads — and it works out every offset, length, type, implied decimal, packed-decimal width, and sign the way the compiler would, then decodes and encodes the actual fixed-width records against that layout. The seven-line hand-count above becomes a function call. And because it reads the source of truth directly, it cannot drift out of sync with it: add a field to the copybook, and the layout updates itself, because it was never a copy in the first place.</p>
+
+      <p>The proof I hold it to is deliberately blunt. I point PICASSO at CATALOG-74's own copybooks — the very ones I once transcribed by hand — and check that it reproduces the exact offsets I typed, byte for byte, no ruler involved. It does. And where it <em>disagrees</em> with my old hand-transcription, it turns out to be right and I was the one who cut a corner — but that is a story for a later post.</p>
+
+      <p>Packaged up, PICASSO is built to become the OutSystems Integration Studio Extension the Forge never had: the COBOL connector, so that the next person with a mainframe extract and a deadline calls an action instead of reaching for the ruler.</p>
+
+      <hr>
+
+      <p style="font-size:15px;color:var(--text-dim);">A note on honesty, because it matters to me and it comes up later in this series: I identified this problem, set the scope, and validated every layout the parser produces against real mainframe data — but the .NET engine itself was written by an AI (Claude) working under my direction. I think the division of labour is genuinely interesting, and I would rather tell you about it plainly than let you assume otherwise. Part 5 is entirely about what that collaboration was actually like.</p>
+
+      <div class="series-next">
+        <p class="label">Where this series is going</p>
+        <ol>
+          <li class="done"><b>The thing that should already exist</b><span class="tag">you are here</span></li>
+          <li>What's actually inside a copybook — and why a human counting characters gets it wrong</li>
+          <li>Let the real files find the bugs: "fail loudly, never silently miscompute"</li>
+          <li>Trust, but verify — proving a parser against a real COBOL compiler</li>
+          <li>I didn't write a line of the C#: directing an AI to build it</li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="back" href="index.html">&larr; All writing</a>
+    <div class="contact-links">
+      <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>
+      <a href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO</a>
+      <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
+    </div>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) — self-hosted, no cloud provider involved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
