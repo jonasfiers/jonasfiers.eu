@@ -1,0 +1,21 @@
+/* Design tokens — single source of truth for the whole site.
+   Linked by every page (index.html and blog/*.html). The homepage and the
+   blog both used to carry their own copy of this :root block; they now share
+   this one. Note: --pink was previously missing from the homepage's copy —
+   it is defined here so the shared chrome (Writing link, brand dot) resolves
+   everywhere. Fonts are still declared per-context (blog.css / index.html's
+   inline @font-face) because their url() paths differ by directory depth. */
+:root{
+  --bg:#12172B;
+  --surface:#1B2340;
+  --surface-2:#232C52;
+  --border:#2E3760;
+  --text:#EDEFF7;
+  --text-dim:#9AA3C0;
+  --lime:#C6F135;
+  --coral:#FF6F59;
+  --pink:#E8437E;            /* PICASSO series accent */
+  --mono:'JetBrains Mono', monospace;
+  --sans:'Satoshi', sans-serif;
+  --display:'Cabinet Grotesk', sans-serif;
+}

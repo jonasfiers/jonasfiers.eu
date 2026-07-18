@@ -1,0 +1,86 @@
+/* Shared site chrome — the header/nav bar and the slim page footer.
+   Single source of truth for the persistent chrome that appears on every
+   page (homepage + blog). Moved out of blog/blog.css so the homepage can
+   reuse the exact same styling. Linked by every page.
+
+   Deliberately does NOT define `.wrap` or `.contact-links` as bare selectors:
+   the homepage uses those class names with a different max-width / layout, so
+   keeping them page-local avoids a cross-page collision. Only the more
+   specific, chrome-scoped forms live here (`.site-header .wrap`, the footer's
+   `.site-footer`-scoped rules). The homepage has no `.site-header` /
+   `.site-footer` of its own, so nothing here touches the homepage's design. */
+
+/* SITE HEADER — persistent, links back to the portfolio */
+.site-header{
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:rgba(18,23,43,0.82);
+  backdrop-filter:blur(8px);
+}
+.site-header .wrap{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:60px;
+}
+.brand{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:17px;
+  text-decoration:none;
+  color:var(--text);
+  letter-spacing:-0.01em;
+}
+.brand span{color:var(--pink);}
+.nav-links{
+  display:flex;
+  gap:22px;
+  font-family:var(--mono);
+  font-size:13.5px;
+}
+.nav-links a{
+  color:var(--text-dim);
+  text-decoration:none;
+  transition:color 0.15s ease, opacity 0.15s ease;
+}
+/* section colour language: portfolio = lime, writing = pink */
+.nav-links a.to-portfolio{color:var(--lime);}
+.nav-links a.to-writing{color:var(--pink);}
+.nav-links a:hover{opacity:0.72;}
+.nav-links a[aria-current="page"]{text-decoration:underline;text-underline-offset:4px;}
+
+/* FOOTER (slim, blog pages) */
+.site-footer{
+  border-top:1px solid var(--border);
+  margin-top:72px;
+  padding:44px 0 60px;
+  text-align:center;
+}
+.site-footer .back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--mono);
+  font-size:14px;
+  text-decoration:none;
+  border:1px solid;
+  padding:9px 16px;
+  border-radius:8px;
+  transition:background 0.15s ease, color 0.15s ease;
+}
+.site-footer .back.to-writing{color:var(--pink);border-color:var(--pink);}
+.site-footer .back.to-writing:hover{background:var(--pink);color:var(--bg);}
+.site-footer .back.to-portfolio{color:var(--lime);border-color:var(--lime);}
+.site-footer .back.to-portfolio:hover{background:var(--lime);color:var(--bg);}
+.site-footer .fine{
+  margin-top:26px;
+  font-family:var(--mono);
+  font-size:12.5px;
+  color:var(--text-dim);
+}
+
+@media(max-width:640px){
+  .nav-links{gap:16px;font-size:12.5px;}
+}
