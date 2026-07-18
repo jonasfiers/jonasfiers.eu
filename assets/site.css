@@ -25,22 +25,22 @@
 /* ── 1. FONTS ───────────────────────────────────────────────────────────────*/
 @font-face{
   font-family:'Cabinet Grotesk';
-  src:url('/fonts/CabinetGrotesk-Variable.woff2') format('woff2-variations');
+  src:url('../fonts/CabinetGrotesk-Variable.woff2') format('woff2-variations');
   font-weight:300 900; font-style:normal; font-display:swap;
 }
 @font-face{
   font-family:'Satoshi';
-  src:url('/fonts/Satoshi-Variable.woff2') format('woff2-variations');
+  src:url('../fonts/Satoshi-Variable.woff2') format('woff2-variations');
   font-weight:300 900; font-style:normal; font-display:swap;
 }
 @font-face{
   font-family:'JetBrains Mono';
-  src:url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  src:url('../fonts/JetBrainsMono-Regular.woff2') format('woff2');
   font-weight:400; font-style:normal; font-display:swap;
 }
 @font-face{
   font-family:'JetBrains Mono';
-  src:url('/fonts/JetBrainsMono-Medium.woff2') format('woff2');
+  src:url('../fonts/JetBrainsMono-Medium.woff2') format('woff2');
   font-weight:500; font-style:normal; font-display:swap;
 }
 
