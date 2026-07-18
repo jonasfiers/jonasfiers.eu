@@ -83,9 +83,13 @@ a{color:inherit;}
 .nav-links a{
   color:var(--text-dim);
   text-decoration:none;
-  transition:color 0.15s ease;
+  transition:color 0.15s ease, opacity 0.15s ease;
 }
-.nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--lime);}
+/* section colour language: portfolio = lime, writing = pink */
+.nav-links a.to-portfolio{color:var(--lime);}
+.nav-links a.to-writing{color:var(--pink);}
+.nav-links a:hover{opacity:0.72;}
+.nav-links a[aria-current="page"]{text-decoration:underline;text-underline-offset:4px;}
 
 /* FOOTER */
 .site-footer{
@@ -100,14 +104,16 @@ a{color:inherit;}
   gap:8px;
   font-family:var(--mono);
   font-size:14px;
-  color:var(--pink);
   text-decoration:none;
-  border:1px solid var(--pink);
+  border:1px solid;
   padding:9px 16px;
   border-radius:8px;
   transition:background 0.15s ease, color 0.15s ease;
 }
-.site-footer .back:hover{background:var(--pink);color:var(--bg);}
+.site-footer .back.to-writing{color:var(--pink);border-color:var(--pink);}
+.site-footer .back.to-writing:hover{background:var(--pink);color:var(--bg);}
+.site-footer .back.to-portfolio{color:var(--lime);border-color:var(--lime);}
+.site-footer .back.to-portfolio:hover{background:var(--lime);color:var(--bg);}
 .site-footer .fine{
   margin-top:26px;
   font-family:var(--mono);
