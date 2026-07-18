@@ -63,7 +63,7 @@ function headerHTML(page) {
   const writCur = (page.loc === 'blog' && page.footer === 'landing') ? ' aria-current="page"' : '';
   return `<header class="site-header section-${page.section}">
   <div class="wrap">
-    <a class="brand" href="${brand}">Jonas Fiers<span>.</span></a>
+    <a class="brand" href="${brand}"><span>(:</span>Jonas Fiers<span>)</span></a>
     <nav class="nav-links" aria-label="Primary">
       <a class="to-portfolio" href="${port}"${portCur}>Portfolio</a>
       <a class="to-writing" href="${writ}"${writCur}>Writing</a>
