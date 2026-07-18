@@ -1,9 +1,8 @@
-<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="(:JF) — Jonas Fiers">
   <rect width="32" height="32" rx="6" fill="#12172B"/>
-  <line x1="8" y1="10" x2="16" y2="22" stroke="#C6F135" stroke-width="1.4" opacity="0.6"/>
-  <line x1="16" y1="22" x2="24" y2="9" stroke="#C6F135" stroke-width="1.4" opacity="0.6"/>
-  <line x1="8" y1="10" x2="24" y2="9" stroke="#C6F135" stroke-width="1.4" opacity="0.35"/>
-  <circle cx="8" cy="10" r="3" fill="#C6F135"/>
-  <circle cx="24" cy="9" r="3" fill="#C6F135"/>
-  <circle cx="16" cy="22" r="3.4" fill="#FF6F59"/>
+  <text x="16" y="16.9" text-anchor="middle" dominant-baseline="middle"
+        font-family="ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace"
+        font-weight="700" font-size="10" letter-spacing="-0.8">
+    <tspan fill="#C6F135">(:</tspan><tspan fill="#EDEFF7">JF</tspan><tspan fill="#C6F135">)</tspan>
+  </text>
 </svg>
