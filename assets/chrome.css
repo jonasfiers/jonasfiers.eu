@@ -33,7 +33,9 @@
   color:var(--text);
   letter-spacing:-0.01em;
 }
-.brand span{color:var(--pink);}
+/* brand dot follows the current section: lime on portfolio, pink on writing */
+.site-header.section-portfolio .brand span{color:var(--lime);}
+.site-header.section-writing .brand span{color:var(--pink);}
 .nav-links{
   display:flex;
   gap:22px;
@@ -42,13 +44,16 @@
 }
 .nav-links a{
   color:var(--text-dim);
+  text-transform:lowercase;
   text-decoration:none;
-  transition:color 0.15s ease, opacity 0.15s ease;
+  transition:color 0.15s ease;
 }
-/* section colour language: portfolio = lime, writing = pink */
-.nav-links a.to-portfolio{color:var(--lime);}
-.nav-links a.to-writing{color:var(--pink);}
-.nav-links a:hover{opacity:0.72;}
+/* section colour language: neutral grey at rest, section colour only on hover
+   or when this is the current section (portfolio = lime, writing = pink) */
+.nav-links a.to-portfolio:hover,
+.nav-links a.to-portfolio[aria-current="page"]{color:var(--lime);}
+.nav-links a.to-writing:hover,
+.nav-links a.to-writing[aria-current="page"]{color:var(--pink);}
 .nav-links a[aria-current="page"]{text-decoration:underline;text-underline-offset:4px;}
 
 /* FOOTER (slim, blog pages) */

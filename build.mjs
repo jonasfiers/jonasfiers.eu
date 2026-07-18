@@ -61,7 +61,7 @@ function headerHTML(page) {
   const writ  = root ? 'blog/index.html' : 'index.html';
   const portCur = root ? ' aria-current="page"' : '';
   const writCur = (page.loc === 'blog' && page.footer === 'landing') ? ' aria-current="page"' : '';
-  return `<header class="site-header">
+  return `<header class="site-header section-${page.section}">
   <div class="wrap">
     <a class="brand" href="${brand}">Jonas Fiers<span>.</span></a>
     <nav class="nav-links" aria-label="Primary">
