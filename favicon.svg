@@ -1,8 +1,8 @@
-<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="(:JF) — Jonas Fiers">
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label=":JF — Jonas Fiers">
   <rect width="32" height="32" rx="6" fill="#12172B"/>
   <text x="16" y="16.9" text-anchor="middle" dominant-baseline="middle"
         font-family="ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace"
-        font-weight="700" font-size="10" letter-spacing="-0.8">
-    <tspan fill="#C6F135">(:</tspan><tspan fill="#EDEFF7">JF</tspan><tspan fill="#C6F135">)</tspan>
+        font-weight="700" font-size="13">
+    <tspan fill="#C6F135">:</tspan><tspan fill="#EDEFF7">JF</tspan>
   </text>
 </svg>
