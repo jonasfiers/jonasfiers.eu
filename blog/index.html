@@ -32,10 +32,12 @@
   All six posts are now drafted; the outline below is kept as the map.
 
   1. The thing that should already exist                        [DRAFTED]
-     The goal, and why I picked it. The OutSystems Forge has no COBOL
-     connector, so every mainframe integration gets hand-rolled; CATALOG-74's
-     specs.js is that hand-transcription in miniature. Nobody built the parser
-     that should exist. That's PICASSO.
+     The goal, and why I picked it. Copybook parsing is solved everywhere
+     except inside OutSystems: the Forge has no COBOL connector, and the .NET
+     parsers that exist aren't validated or packaged for it, so every mainframe
+     integration on the platform gets hand-rolled; CATALOG-74's specs.js is
+     that hand-transcription in miniature. So I built it where it was missing.
+     That's PICASSO.
 
   2. What's actually inside a copybook
      The anatomy of a COBOL copybook and why deriving a byte layout is fiddly:
@@ -98,7 +100,7 @@
           <span class="muted">7 min read</span>
         </div>
         <h2>The thing that should already exist</h2>
-        <p>The OutSystems Forge has a connector for almost everything — except COBOL. So every mainframe integration gets hand-rolled by someone reading a copybook and typing byte offsets into a config file. I got tired of watching that, and built the parser nobody had bothered to write.</p>
+        <p>The OutSystems Forge has a connector for almost everything — except COBOL. So every mainframe integration on the platform gets hand-rolled from byte offsets typed into a config file. Copybook parsing is a solved problem everywhere else — so I built it where it was missing, and proved it against a real compiler.</p>
       </a>
 
       <a class="post-card" href="picasso-inside-a-copybook.html">

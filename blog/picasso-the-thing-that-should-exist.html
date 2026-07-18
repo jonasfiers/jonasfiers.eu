@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The thing that should already exist — Jonas Fiers</title>
-<meta name="description" content="The OutSystems Forge has a connector for almost everything except COBOL, so every mainframe integration gets hand-rolled by someone typing byte offsets into a config file. Why I built PICASSO — the parser that reads the copybook and derives those offsets itself.">
+<meta name="description" content="Copybook parsing is a solved problem — everywhere except inside OutSystems, whose Forge has no COBOL connector. So mainframe integrations there get hand-rolled from byte offsets. Why I built PICASSO, a native parser that derives the layout itself, and validated it against a real COBOL compiler.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.jonasfiers.eu/blog/picasso-the-thing-that-should-exist.html">
 <link rel="canonical" href="https://www.jonasfiers.eu/blog/picasso-the-thing-that-should-exist.html">
 <meta property="og:title" content="The thing that should already exist">
-<meta property="og:description" content="The OutSystems Forge has no COBOL connector, so every mainframe integration gets hand-rolled. PICASSO is the parser that reads the copybook and derives the byte layout itself.">
+<meta property="og:description" content="Copybook parsing is solved everywhere except inside OutSystems, whose Forge has no COBOL connector. PICASSO is a native .NET parser that derives the byte layout itself — validated against a real COBOL compiler.">
 <meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -17,7 +17,7 @@
 <meta property="article:author" content="Jonas Fiers">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The thing that should already exist">
-<meta name="twitter:description" content="The OutSystems Forge has no COBOL connector, so every mainframe integration gets hand-rolled. PICASSO is the parser that reads the copybook and derives the byte layout itself.">
+<meta name="twitter:description" content="Copybook parsing is solved everywhere except inside OutSystems, whose Forge has no COBOL connector. PICASSO is a native .NET parser that derives the byte layout itself — validated against a real COBOL compiler.">
 <meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="preload" href="../fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
@@ -60,13 +60,15 @@
         <span class="muted">7 min read</span>
       </p>
       <h1>The thing that should already exist</h1>
-      <p class="standfirst">The OutSystems Forge has a connector for almost everything. It does not have one for COBOL — so every mainframe integration gets hand-rolled, one copybook at a time. This is the story of why I decided to build the piece that was missing.</p>
+      <p class="standfirst">The OutSystems Forge has a connector for almost everything. It does not have one for COBOL — so on that platform, every mainframe integration still gets hand-rolled, one copybook at a time. Copybook parsing is a solved problem almost everywhere else. This is the story of why I built it where it was still missing, and how I proved it right.</p>
       <p class="byline">By Jonas Fiers · first in a series on PICASSO</p>
     </div>
 
     <article class="post">
 
-      <p>Every mainframe integration I have watched go in starts the same way: a person, a copybook, and a ruler.</p>
+      <p>Copybook parsing is a solved problem — everywhere except inside OutSystems. So I solved it there, and validated it against a real COBOL compiler. That's the whole series in two sentences; the rest is why the gap was worth closing and how I know the answer is right.</p>
+
+      <p>Start with the gap, because it's oddly specific. In the low-code platform I spend most of my working life in, every mainframe integration I have watched go in starts the same way: a person, a copybook, and a ruler.</p>
 
       <p>Someone opens a <code>.cpy</code> file — a COBOL <em>copybook</em>, the little schema that describes the exact byte layout of a fixed-width record — and starts counting. This field is nine bytes. The next one starts at offset twelve. That one is packed decimal, so it is really only five bytes on disk even though it holds nine digits. They write those numbers down in a config file somewhere, wire up a parser around them, and ship it. It works. And then someone adds a field three months later, every offset after it shifts by one, and nobody notices until the numbers on a report quietly stop adding up.</p>
 
@@ -95,27 +97,31 @@ const BALANCE_SPEC = [
 
       <p>It works. It is also completely absurd. That line is a hand transcription of information that already exists, in precise machine-readable form, in a file sitting one directory away. I copied a number out of a document, by eye, into another document — the single most error-prone thing a programmer can do — and the original was right there the whole time, waiting to be parsed.</p>
 
+      <p>But the original sitting right there wasn't the same as being able to <em>use</em> it — not from where I work. I had no way to read that copybook from inside the platform I ship in. That was the moment the real project announced itself. Not the expense app. The missing tool underneath it.</p>
+
+      <h2>Solved everywhere except where I needed it</h2>
+
+      <p>Here is the part I want to put on the table first, because it is the first thing a skeptical reader will reach for — and they would be right to. Copybook parsing is not an open problem. It is one of the most thoroughly solved problems in enterprise computing. The rules for turning a <code>PIC</code> clause into a byte width have not meaningfully changed in fifty years, and the tooling reflects that maturity. <a class="inline" href="https://github.com/bmTas/JRecord" target="_blank" rel="noopener">JRecord</a> and <code>cb2xml</code> have parsed copybooks in Java for two decades — and, as it happens, the same author's tooling is what I later cross-check PICASSO's decoded values against. <a class="inline" href="https://github.com/AbsaOSS/cobrix" target="_blank" rel="noopener">Cobrix</a> does it at scale on Spark. There are libraries in Python and Ruby, connectors from the big cloud and ETL vendors, and — of course — every COBOL compiler ever written, which is the whole reason I could eventually check my work against one. Even .NET has a couple of copybook parsers sitting on NuGet, plus Micro Focus's commercial toolchain. So, no: I did not discover an untouched problem.</p>
+
+      <p>What I found was narrower, and more specific. None of that solved tooling is usable from where I was standing.</p>
+
+      <p>In the <a class="inline" href="https://www.outsystems.com/forge/" target="_blank" rel="noopener">OutSystems Forge</a> — the marketplace of connectors for the low-code platform I build in — there is no COBOL connector at all. There are connectors for Salesforce, for Twilio, for a dozen databases, for services that did not exist a decade ago. Search it for "cobol" or "mainframe" across its thousands of components and you get nothing. Reaching the mature tools from OutSystems means standing up a separate Java service or an ETL layer <em>beside</em> your app — a whole second moving part to run, secure, and justify — just to read a flat file. And the native .NET options that do exist are the opposite of reassuring: unmaintained, undocumented, mostly structure-only rather than validated data decoders, several with murky licensing or locked inside a vendor product. Not one is packaged for OutSystems.</p>
+
       <div class="pull">
-        <p>Nobody had written the thing that should exist: a parser that reads the actual copybook and derives those offsets itself.</p>
+        <p>The problem isn't unsolved. It's unsolved <em>here</em> — and the pieces lying around in .NET aren't ones you'd bet a financial record on.</p>
       </div>
 
-      <p>That was the moment the real project announced itself. Not the expense app. The missing tool underneath it.</p>
-
-      <h2>Why the tool was missing</h2>
-
-      <p>Here is the thing that still surprises people. This is not an exotic problem. Copybooks are one of the most stable, best-documented data formats on earth — the rules for turning a <code>PIC</code> clause into a byte width have not meaningfully changed in fifty years. Mainframes still run a serious share of the world's banking, insurance, and government records. Reading their extracts is a daily task for a lot of enterprises.</p>
-
-      <p>And yet, in the <a class="inline" href="https://www.outsystems.com/forge/" target="_blank" rel="noopener">OutSystems Forge</a> — the marketplace of connectors for the low-code platform I spend most of my working life in — there is no COBOL connector. There are connectors for Salesforce, for Twilio, for a dozen databases, for services that did not exist a decade ago. For the format that predates all of them and quietly underpins half of them, there is nothing. So each team that needs to read a mainframe file reaches for the ruler and counts it out again, in isolation, reinventing the same fragile transcription their neighbours already wrote and will have to maintain forever.</p>
-
-      <p>The gap is not that the problem is hard. The gap is that nobody found it interesting enough to close properly. It is unglamorous plumbing. It is exactly the kind of thing that gets worked around one project at a time instead of solved once.</p>
+      <p>So an OutSystems team that needs to read a mainframe extract does the rational thing under the circumstances: it reaches for the ruler and counts the bytes out by hand, in a custom Integration Studio extension, exactly the way I did in a toy. It reinvents a fragile transcription that the wider world solved decades ago but its own platform never handed it. That is the real gap — not "nobody can parse a copybook," but "you can't parse one from inside OutSystems without bolting on infrastructure, and the loose .NET parts aren't trustworthy enough to stake a financial record on." Unglamorous, specific, and worth closing properly, once.</p>
 
       <h2>What I set out to build</h2>
 
-      <p>PICASSO — <em>PICTURE Interpreter for COBOL, Assembling Structured Schemas for OutSystems</em> — is my attempt to solve it once. The goal is stated in a single sentence: point it at a <code>.cpy</code> file, and it derives the byte layout itself.</p>
+      <p>PICASSO — <em>PICTURE Interpreter for COBOL, Assembling Structured Schemas for OutSystems</em> — is my attempt to close that gap where it actually is: natively, in .NET, packaged for the platform that never had it. The goal is stated in a single sentence: point it at a <code>.cpy</code> file, and it derives the byte layout itself.</p>
 
       <p>Not a config file you fill in by hand. Not a wizard that asks you where each field starts. You give it the copybook — the same text a mainframe compiler reads — and it works out every offset, length, type, implied decimal, packed-decimal width, and sign the way the compiler would, then decodes and encodes the actual fixed-width records against that layout. The seven-line hand-count above becomes a function call. And because it reads the source of truth directly, it cannot drift out of sync with it: add a field to the copybook, and the layout updates itself, because it was never a copy in the first place.</p>
 
       <p>The proof I hold it to is deliberately blunt. I point PICASSO at CATALOG-74's own copybooks — the very ones I once transcribed by hand — and check that it reproduces the exact offsets I typed, byte for byte, no ruler involved. It does. And where it <em>disagrees</em> with my old hand-transcription, it turns out to be right and I was the one who cut a corner — but that is a story for a later post.</p>
+
+      <p>That instinct — never taking the parser's own word for the answer — is also the thing that most sets PICASSO apart from the .NET copybook parsers already out there. Most of them will hand you a layout; almost none can show you it is <em>right</em>. PICASSO's is cross-checked against a real COBOL compiler and round-tripped through a genuine 1990s mainframe extract, three independent ways that never consult PICASSO's own opinion of itself. That validation is <a class="inline" href="picasso-trust-but-verify.html">Part 4</a>, and it is the part I am proudest of.</p>
 
       <p>Packaged up, PICASSO is built to become the OutSystems Integration Studio Extension the Forge never had: the COBOL connector, so that the next person with a mainframe extract and a deadline calls an action instead of reaching for the ruler.</p>
 
