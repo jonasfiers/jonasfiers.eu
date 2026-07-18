@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let the real files find the bugs — Jonas Fiers</title>
+<meta name="description" content="For a tool that turns bytes into numbers, a silent wrong answer is the worst possible outcome. PICASSO's rule is fail loudly, never silently miscompute — and one genuine 1990s mainframe file found four gaps no synthetic test ever had.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.jonasfiers.eu/blog/picasso-let-the-real-files-find-the-bugs.html">
+<link rel="canonical" href="https://www.jonasfiers.eu/blog/picasso-let-the-real-files-find-the-bugs.html">
+<meta property="og:title" content="Let the real files find the bugs">
+<meta property="og:description" content="Fail loudly, never silently miscompute. How one real 1990s mainframe extract exposed four gaps every synthetic test had missed — and why a silent wrong answer is the cardinal sin for a data tool.">
+<meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-07-24">
+<meta property="article:author" content="Jonas Fiers">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Let the real files find the bugs">
+<meta name="twitter:description" content="Fail loudly, never silently miscompute. How one real 1990s mainframe extract exposed four gaps every synthetic test had missed.">
+<meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preload" href="../fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="blog.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Let the real files find the bugs",
+  "description": "Fail loudly, never silently miscompute — and how one real 1990s mainframe file found four gaps no synthetic test ever had.",
+  "datePublished": "2026-07-24",
+  "author": { "@type": "Person", "name": "Jonas Fiers", "url": "https://www.jonasfiers.eu" },
+  "image": "https://www.jonasfiers.eu/og-image.png",
+  "mainEntityOfPage": "https://www.jonasfiers.eu/blog/picasso-let-the-real-files-find-the-bugs.html",
+  "isPartOf": { "@type": "Blog", "name": "Notes from the build" }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Jonas Fiers<span>.</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../index.html">Portfolio</a>
+      <a href="index.html">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="article-head">
+      <p class="kicker">
+        <span>PICASSO · Part 3</span>
+        <span class="muted">24 Jul 2026</span>
+        <span class="muted">8 min read</span>
+      </p>
+      <h1>Let the real files find the bugs</h1>
+      <p class="standfirst">For most software a wrong answer is a bug you fix. For a tool that turns raw bytes into numbers, a wrong answer that <em>looks right</em> is the whole failure. So PICASSO has one rule above all the others: fail loudly, never silently miscompute.</p>
+      <p class="byline">By Jonas Fiers · third in a series on PICASSO</p>
+    </div>
+
+    <article class="post">
+
+      <p>There's a particular kind of bug I've learned to be afraid of. Not the crash — the crash is honest. It stops, it points at a line, someone fixes it. The one to fear is the calculation that runs cleanly to completion and hands back a number that is simply wrong, with the same confident face it wears when it's right.</p>
+
+      <p>A copybook parser lives entirely in that danger zone. Its output is byte offsets, and a byte offset is either exactly correct or it silently poisons every field after it. Read one COMP-3 field as three bytes instead of two — the mistake from <a class="inline" href="picasso-inside-a-copybook.html">the last post</a> — and the extract still decodes. You still get numbers. They're just shifted by one byte from there to the end of the record, and they look every bit as plausible as the real ones. Nobody sees a stack trace. They see a report where the totals are a little off, three weeks later, and no idea why.</p>
+
+      <div class="pull">
+        <p>A crash is honest. The bug to fear is the one that finishes cleanly and hands back a plausible wrong number.</p>
+      </div>
+
+      <h2>The rule: fail loudly</h2>
+
+      <p>So the governing principle of the whole project is stated as a prohibition: <strong>never silently miscompute</strong>. If PICASSO cannot lay a field out with certainty — an unsupported <code>USAGE</code>, a construct it doesn't model, a copybook shape it wasn't built for — it does not guess, does not skip the clause and hope, does not fall back to a best effort. It throws a named, specific error and stops. A refusal is recoverable: you read it, you understand it, you decide what to do. A silent wrong answer is not, because you never find out it happened.</p>
+
+      <p>That sounds obvious written down. It is emphatically not what the code did at first, and the gap between the two is instructive — because the silent-miscompute holes were exactly the ones that unit tests sailed straight past.</p>
+
+      <h2>The bugs that passed every test</h2>
+
+      <p>Early on, several constructs PICASSO didn't support weren't <em>rejected</em> — they were quietly ignored, treated like the genuinely harmless clauses (<code>VALUE</code>, <code>JUSTIFIED</code>) that carry no storage and can safely be skipped. The trouble is that these ones <em>do</em> carry storage, so skipping them didn't produce an error. It produced a layout that was wrong and said nothing:</p>
+
+      <ul>
+        <li><strong>OCCURS and REDEFINES</strong> both used to fall through to the skip-a-token path. A repeating field or an overlapping one would parse "successfully" — with silently wrong offsets for every field after it. They're now named rejections; support came later, deliberately, one at a time.</li>
+        <li><strong>An OCCURS length that overflowed.</strong> The arithmetic that multiplies out a repeat count could overflow an integer and wrap to a small positive number — a pathologically large table computing a plausible tiny length. It's now a checked overflow that fails loud rather than wrapping.</li>
+        <li><strong>An elementary item with subordinates.</strong> A field that had both a <code>PIC</code> of its own <em>and</em> children under it used to silently drop the children and shift every following offset. Now it's a named error.</li>
+        <li><strong>A mistyped <code>COMPUTATIONAL</code>.</strong> <code>COMPUTATIONAL3</code> with a dropped hyphen, or a <code>COMP-7</code> that doesn't exist, used to be silently skipped — leaving the field mis-sized as plain DISPLAY. Now an unrecognized computational usage is rejected by name.</li>
+      </ul>
+
+      <p>Every one of these had passing unit tests around the code near it. None of the tests caught the hole, because a unit test checks the case you thought of, and by definition you didn't think of the case where your own code quietly does the wrong thing. What caught them was pointing the parser at input that didn't care what I'd thought of.</p>
+
+      <h2>Enter a real 1990s mainframe file</h2>
+
+      <p>PICASSO's test suite has plenty of synthetic copybooks — small ones I wrote to exercise a specific rule. They're useful and they're clean, and being clean is their weakness: a synthetic copybook only ever contains the problems its author already knew to put in it. So I went and got one I hadn't written.</p>
+
+      <p><code>DTAR020</code> is a genuine COBOL copybook from an actual reporting system, dated 19/12/90, credited in its own header to "Bruce Arthur," reused as a teaching example across open-source COBOL tooling for years. It comes with a real 379-record, 10,233-byte binary extract — the actual bytes, straight off the system. I bundled both into PICASSO <em>unmodified</em>: sequence numbers intact, header comments intact, nothing cleaned up to suit the parser. That decision is the entire point. The moment you tidy a file to make it parse, it stops being a test of reality and becomes a test of your tidying.</p>
+
+      <p>Running the untouched file surfaced four separate gaps, none of which any synthetic copybook had, because synthetic copybooks don't have these problems by construction:</p>
+
+      <h3>1. The source was fixed-format</h3>
+
+      <p>Every copybook I'd written was free-format — code starting at the left margin. Real COBOL source from the era is <strong>fixed-format</strong>: columns 1–6 are a line-sequence number, column 7 is a comment/continuation flag, and the code lives in columns 8–72. DTAR020's lines begin <code>000900</code>, <code>001000</code>, <code>001100</code>. Fed those, the parser read the sequence numbers as level numbers and produced one garbage field — silently, of course. It now detects fixed-format per line, strips the sequence area, honours the column-7 comment flag, and ignores the identification area in columns 73–80. Both formats can even mix in one file.</p>
+
+      <h3>2. The text was EBCDIC</h3>
+
+      <p>The one <code>PIC X</code> field decoded to <code>öùöøôõõø</code> — the right eight bytes read through the wrong character set. The file is EBCDIC cp037, not ASCII, and PICASSO was Latin-1 only. The fix isn't just "add EBCDIC"; it's applying the code page <em>per field</em>, so the packed-decimal fields are left strictly alone. Translate the whole record and you'd corrupt every COMP-3 field in it — the same mistake as pulling a mainframe file over FTP in ASCII mode. (I gave EBCDIC and packed decimal a proper airing in <a class="inline" href="picasso-inside-a-copybook.html">Part 2</a>.)</p>
+
+      <h3>3. The records had no delimiters</h3>
+
+      <p>10,233 bytes is exactly 379 × 27. There is nothing between the records — no newline, no marker, just a bare concatenation you slice by the layout's own width. The codec had been splitting on newlines, a Unix convention a mainframe file has never heard of, so it handed the layout all 10,233 bytes as one oversized record. Worse, this file carries 21 <code>0x0D</code> bytes <em>inside its COMP-3 fields</em> (<code>0x0D</code> is the digit 0 with a negative sign nibble) — so any newline-normalisation would have eaten real data and shifted every record after it. Undelimited slicing is now a supported mode. It's deliberately <em>not</em> auto-detected, because a delimited file's length can divide evenly by the record length too, and guessing would return a plausible count of misaligned records — the silent wrong answer again.</p>
+
+      <h3>4. It was headless</h3>
+
+      <p>DTAR020 opens at level <code>03</code>. There is no <code>01</code> wrapping it, because it's a copy member — designed to be pulled into a record the including program names, which PICASSO never sees. A common, legitimate shape. The parser now supplies the <code>01</code> the compiler would have inherited and flags that it did so, rather than choking on the missing top level. (Two <code>01</code> records in one copybook is still refused — those are alternative layouts, not one record, and merging them would describe neither.)</p>
+
+      <h2>Why this is the method, not an anecdote</h2>
+
+      <p>Four gaps, one file, none of them things I'd have invented a test for — because each was a way the real world is shaped that my imagination had smoothed over. That's not luck. It's the predictable result of a rule I now hold to deliberately: <strong>synthetic tests confirm what you already understand; real files tell you what you don't.</strong> The synthetic suite is still there and still valuable — it pins down the rules I do know, and it runs in a second. But it is structurally incapable of surprising me, and the bugs that matter for a data tool are the surprising ones.</p>
+
+      <p>The two disciplines reinforce each other. Fail-loudly means that when a real file hits something unhandled, I get a clean, named refusal pointing straight at the construct — not a mystery number I have to reverse-engineer weeks later. So every real file I run is either a clean pass or a precise signpost to the next gap. That loop — run something real, read the loud failure, close the gap, run it again — is how DTAR020 went from four rejections to a file that now round-trips all 379 records byte-for-byte through nothing but the public API. It's also how the broader corpus of a few hundred real copybooks got worked through, one honest failure at a time.</p>
+
+      <p>None of which, on its own, proves the offsets are actually <em>right</em>. A parser can fail loudly and still confidently compute the wrong layout for something it thinks it understands. Round-tripping a file to the same bytes it came in as is a strong signal, but it's still the tool checking its own work. To really trust the numbers I needed a source of truth that isn't PICASSO — three of them, in fact. That's <a class="inline" href="picasso-trust-but-verify.html">the next post</a>.</p>
+
+      <div class="series-next">
+        <p class="label">The series</p>
+        <ol>
+          <li><a class="inline" href="picasso-the-thing-that-should-exist.html">The thing that should already exist</a></li>
+          <li><a class="inline" href="picasso-inside-a-copybook.html">What's actually inside a copybook</a></li>
+          <li class="done"><b>Let the real files find the bugs</b><span class="tag">you are here</span></li>
+          <li><a class="inline" href="picasso-trust-but-verify.html">Trust, but verify — proving it against a real compiler</a></li>
+          <li><a class="inline" href="picasso-i-didnt-write-the-csharp.html">I didn't write a line of the C#</a></li>
+          <li><a class="inline" href="picasso-the-last-mile-is-a-windows-gui.html">The last mile is a Windows GUI</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="back" href="index.html">&larr; All writing</a>
+    <div class="contact-links">
+      <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>
+      <a href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO</a>
+      <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
+    </div>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) — self-hosted, no cloud provider involved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

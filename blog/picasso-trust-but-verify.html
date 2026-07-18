@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust, but verify — Jonas Fiers</title>
+<meta name="description" content="How do you trust a parser whose entire job is byte offsets, when a one-byte error silently shifts every field after it? You check it three ways that don't reference each other — a real COBOL compiler, an independent tool's published values, and a human's hand-transcription.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.jonasfiers.eu/blog/picasso-trust-but-verify.html">
+<link rel="canonical" href="https://www.jonasfiers.eu/blog/picasso-trust-but-verify.html">
+<meta property="og:title" content="Trust, but verify">
+<meta property="og:description" content="Proving a copybook parser three independent, non-self-referential ways: a GnuCOBOL differential oracle, a third party's own published values, and a human's hand-transcription — plus the one discrepancy kept on purpose.">
+<meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-07-28">
+<meta property="article:author" content="Jonas Fiers">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Trust, but verify">
+<meta name="twitter:description" content="Proving a copybook parser three independent, non-self-referential ways — a real compiler, a third party's published values, and a human's hand-transcription.">
+<meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preload" href="../fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="blog.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Trust, but verify",
+  "description": "Proving a copybook parser three independent ways — a real compiler, a third party's published values, and a human's hand-transcription.",
+  "datePublished": "2026-07-28",
+  "author": { "@type": "Person", "name": "Jonas Fiers", "url": "https://www.jonasfiers.eu" },
+  "image": "https://www.jonasfiers.eu/og-image.png",
+  "mainEntityOfPage": "https://www.jonasfiers.eu/blog/picasso-trust-but-verify.html",
+  "isPartOf": { "@type": "Blog", "name": "Notes from the build" }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Jonas Fiers<span>.</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../index.html">Portfolio</a>
+      <a href="index.html">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="article-head">
+      <p class="kicker">
+        <span>PICASSO · Part 4</span>
+        <span class="muted">28 Jul 2026</span>
+        <span class="muted">8 min read</span>
+      </p>
+      <h1>Trust, but verify</h1>
+      <p class="standfirst">A parser whose whole job is byte offsets has a nasty property: a one-byte error is invisible and total. So you don't get to trust it because it feels right. You prove it three ways that don't quote each other — and you keep the one place it disagrees, on purpose.</p>
+      <p class="byline">By Jonas Fiers · fourth in a series on PICASSO</p>
+    </div>
+
+    <article class="post">
+
+      <p>Say I hand you a copybook parser and tell you it's correct. How would you check? You could read the code — but the bugs that matter here aren't the kind you spot by reading; two of the worst ones in this project's history (<a class="inline" href="picasso-let-the-real-files-find-the-bugs.html">last post</a>) read as perfectly reasonable code and still computed silent nonsense. You could run its own test suite — but a test suite written by the same person who wrote the parser encodes the same assumptions, so it agrees with the parser precisely where you'd most want an outside opinion.</p>
+
+      <p>The only verification worth anything is one that doesn't derive from the thing being verified. For a byte layout that turns out to be a high bar, because the obvious sources of truth are all somewhere downstream of the same understanding. So PICASSO is checked three ways, and the thing they have in common is that <em>none of them is PICASSO</em>.</p>
+
+      <h2>One: diff it against a real compiler</h2>
+
+      <p>The most authoritative statement of what a copybook means is what an actual COBOL compiler does with it. A compiler has computed these offsets, correctly, for decades — it is the reference implementation of the rules a parser is trying to reproduce. So the strongest check available is a <strong>differential oracle</strong> against one.</p>
+
+      <p>PICASSO carries a harness (<code>tools/layout-oracle</code>) that does exactly this against <strong>GnuCOBOL</strong> — <code>cobc</code>, a real, open-source COBOL compiler, configured for IBM/MVS sizing. For each copybook it generates a tiny program that includes the layout, compiles it, and asks the <em>compiler</em> for the authoritative <code>LENGTH OF</code> every field and of the whole record. Then it diffs those lengths against the offsets PICASSO computed independently. Two engines, no shared code, same input — do they agree?</p>
+
+      <div class="pull">
+        <p>Two engines that share no code, fed the same copybook. If PICASSO and a real compiler compute the same length, it isn't a coincidence.</p>
+      </div>
+
+      <p>Run across the broad external corpus PICASSO is exercised on — several hundred real copybooks pulled from open-source projects like AbsaOSS/cobrix, JRecord, and AWS CardDemo — PICASSO's record length matches the compiler on <strong>every copybook <code>cobc</code> can build</strong>, with exactly one systematic exception I'll come to. That's the check I trust most, because a compiler is not going to be politely wrong in the same way I am. And it's not a one-time audit: every new layout feature — REDEFINES, SYNC alignment, group-level <code>USAGE</code> inheritance, <code>OCCURS DEPENDING ON</code> — is gated on an oracle pass before it's allowed to merge. If the compiler disagrees, the feature isn't done.</p>
+
+      <h2>Two: check values a third party published</h2>
+
+      <p>A compiler agreeing on <em>lengths</em> is powerful, but it's still about layout. I also wanted proof that the actual decoded <em>values</em> come out right — and, again, not values I'd generated myself.</p>
+
+      <p>This is where DTAR020 earns its place a second time. It's a real extract (379 records, 10,233 bytes, EBCDIC, packed decimal, undelimited, headless — every hard property at once). Crucially, it's been used as a worked example by an unrelated tool, <strong>CobolToJson</strong>, whose README publishes what specific fields of specific records decode to. So PICASSO's test suite decodes the file and asserts those fields against <em>CobolToJson's own published output</em> — a number a different team printed, from a different codebase, before PICASSO existed. Then it re-encodes the whole file and checks it reproduces the original 10,233 bytes exactly. Independent values on the way in, byte-for-byte identity on the way out, including the negative packed-decimal values that are easiest to get subtly wrong.</p>
+
+      <h2>Three: match a human who did it by hand</h2>
+
+      <p>The third check closes the loop back to where the series started. CATALOG-74's <code>specs.js</code> is a byte layout a developer — me — worked out by hand and typed into a config file, back before the parser existed. It's the exact artefact PICASSO is meant to replace. So a parity test points PICASSO at CATALOG-74's own copybooks and asserts it reproduces those hand-typed offsets, byte-for-byte.</p>
+
+      <p>This one is a different <em>kind</em> of evidence from the other two. The compiler is more authoritative than a human and CobolToJson is an independent machine, but the hand-transcription is the real-world baseline the tool has to beat to justify existing: if PICASSO can't reproduce what a careful human already got right, it's not fit to replace them. It does reproduce it — with one telling exception, which is the most interesting result in the whole exercise.</p>
+
+      <h2>The place PICASSO is right and the human wasn't</h2>
+
+      <p>In Part 1 I promised this story. Here it is. <code>BALANCE-REC</code> has a field:</p>
+
+      <div class="code-block">
+<pre>NET-BALANCE   PIC S9(7)V99  SIGN IS TRAILING SEPARATE.</pre>
+        <span class="cap">Nine digits, an implied decimal, and — because of <code>SEPARATE</code> — a tenth byte holding the sign. Ten bytes, one field.</span>
+      </div>
+
+      <p>That <code>SIGN IS TRAILING SEPARATE</code> reserves a whole extra byte, belonging to the <em>same</em> data item, to hold a literal sign character. It's one field, ten bytes wide, that decodes straight to a signed decimal. But my hand-transcription didn't model signed types at all, so I fudged it — I split it into two synthetic fields:</p>
+
+      <div class="code-block">
+<pre>{ name: 'netBalance', start: 30, len: 9, type: 'int' },
+{ name: 'sign',       start: 39, len: 1, type: 'str' },</pre>
+        <span class="cap">The hand version: nine digits as one field, the sign byte as a separate string — then glued back together at read time by a bolted-on helper.</span>
+      </div>
+
+      <p>...and then needed a special helper elsewhere in the code to glue the digits and the sign back into an actual signed number at read time. It works. It's also a workaround for a limitation in my hand-rolled codec, leaking into what's supposed to be a faithful description of the record.</p>
+
+      <p>PICASSO models it the way COBOL actually defines it: <strong>one</strong> <code>NET-BALANCE</code> field spanning all ten bytes, decoding directly to a signed decimal. No synthetic <code>sign</code> field, no glue helper. And the parity test doesn't quietly tolerate the difference as a near-miss — it asserts the merged single field <em>on purpose</em>, as the parser getting right exactly what the human cut a corner on. When your automated tool disagrees with the hand-made baseline, the honest move is to figure out who's correct and encode the answer, not to loosen the test until they match. Here, the tool was correct.</p>
+
+      <h2>The discrepancy kept on purpose</h2>
+
+      <p>Which brings me to the single systematic disagreement with the compiler, because the right way to handle a known difference is to document it loudly, not paper over it. It's about <code>COMP-5</code>.</p>
+
+      <p>PICASSO sizes <code>COMP-5</code> the <strong>IBM</strong> way — the same 2/4/8-byte widths as <code>COMP-4</code>, fixed by digit count, widening only the value range and not the storage. That's what mainframe data actually uses, and it's the target PICASSO is built for. Native GnuCOBOL, by contrast, sizes <code>COMP-5</code> byte-granularly, so a small item can come out a byte narrower. When the oracle run first flagged this, it would have been easy to "fix" PICASSO to match the compiler and make the diff go green. That would have been wrong — it would have made PICASSO agree with GnuCOBOL's native mode and <em>disagree with the mainframe extracts it's supposed to read</em>. So the divergence stays, deliberately, and it's written down in the code, the README, and the oracle's own notes as a dialect assumption rather than a bug. A green diff is not the goal. A correct layout is, and sometimes those point in opposite directions — the job is to know which is which and say so.</p>
+
+      <h2>Why three, and why disjoint</h2>
+
+      <p>Any one of these checks has a blind spot. The compiler is authoritative on layout but I only run it where <code>cobc</code> can build the copybook. The published values are independent but cover the fields one tool happened to print. The hand-transcription is the real target but a human is fallible — as <code>NET-BALANCE</code> proves. The point isn't any single check; it's that their blind spots don't overlap. A layout error big enough to matter would have to survive a real compiler's arithmetic <em>and</em> a third party's decoded values <em>and</em> a human's hand-count, all at once, all agreeing on the same wrong answer. For a byte offset, that conjunction is about as close to proof as this kind of tool gets — and it's proof that never once consults PICASSO's own opinion of itself.</p>
+
+      <p>There's a fair question hanging over all of this, and I've been putting it off for four posts. I keep saying "PICASSO computes," "the parser models," "the code refuses" — but I didn't write that code. The next post is about who did, and what that was actually like.</p>
+
+      <div class="series-next">
+        <p class="label">The series</p>
+        <ol>
+          <li><a class="inline" href="picasso-the-thing-that-should-exist.html">The thing that should already exist</a></li>
+          <li><a class="inline" href="picasso-inside-a-copybook.html">What's actually inside a copybook</a></li>
+          <li><a class="inline" href="picasso-let-the-real-files-find-the-bugs.html">Let the real files find the bugs</a></li>
+          <li class="done"><b>Trust, but verify</b><span class="tag">you are here</span></li>
+          <li><a class="inline" href="picasso-i-didnt-write-the-csharp.html">I didn't write a line of the C#</a></li>
+          <li><a class="inline" href="picasso-the-last-mile-is-a-windows-gui.html">The last mile is a Windows GUI</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="back" href="index.html">&larr; All writing</a>
+    <div class="contact-links">
+      <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>
+      <a href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO</a>
+      <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
+    </div>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) — self-hosted, no cloud provider involved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

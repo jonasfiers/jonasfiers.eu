@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's actually inside a copybook — Jonas Fiers</title>
+<meta name="description" content="A COBOL copybook looks like a list of fields you could count on your fingers. It isn't. Packed decimal, binary integers, implied decimals, EBCDIC and overpunched signs mean the byte layout almost never matches the character count — here's why.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.jonasfiers.eu/blog/picasso-inside-a-copybook.html">
+<link rel="canonical" href="https://www.jonasfiers.eu/blog/picasso-inside-a-copybook.html">
+<meta property="og:title" content="What's actually inside a copybook">
+<meta property="og:description" content="Why deriving a byte layout from a COBOL copybook is fiddly: packed decimal, binary COMP, implied decimals, EBCDIC and overpunched signs mean the bytes never match the character count.">
+<meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-07-21">
+<meta property="article:author" content="Jonas Fiers">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What's actually inside a copybook">
+<meta name="twitter:description" content="Why deriving a byte layout from a COBOL copybook is fiddly: packed decimal, binary COMP, implied decimals, EBCDIC and overpunched signs mean the bytes never match the character count.">
+<meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preload" href="../fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="blog.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "What's actually inside a copybook",
+  "description": "Why deriving a byte layout from a COBOL copybook is fiddly: packed decimal, binary COMP, implied decimals, EBCDIC and overpunched signs.",
+  "datePublished": "2026-07-21",
+  "author": { "@type": "Person", "name": "Jonas Fiers", "url": "https://www.jonasfiers.eu" },
+  "image": "https://www.jonasfiers.eu/og-image.png",
+  "mainEntityOfPage": "https://www.jonasfiers.eu/blog/picasso-inside-a-copybook.html",
+  "isPartOf": { "@type": "Blog", "name": "Notes from the build" }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Jonas Fiers<span>.</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../index.html">Portfolio</a>
+      <a href="index.html">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="article-head">
+      <p class="kicker">
+        <span>PICASSO · Part 2</span>
+        <span class="muted">21 Jul 2026</span>
+        <span class="muted">8 min read</span>
+      </p>
+      <h1>What's actually inside a copybook</h1>
+      <p class="standfirst">A copybook looks like a tidy list of fields you could count on your fingers. That impression is the trap. Almost nothing in it is one byte per character — and every place that's true is a place a human with a ruler gets the offset wrong.</p>
+      <p class="byline">By Jonas Fiers · second in a series on PICASSO</p>
+    </div>
+
+    <article class="post">
+
+      <p>In <a class="inline" href="picasso-the-thing-that-should-exist.html">the first post</a> I described the ritual: a person, a copybook, and a ruler, counting bytes by eye into a config file. I want to spend this post on <em>why</em> that count is so easy to get wrong — because the reasons are the whole reason PICASSO has to exist. If a copybook really were one character per byte, you wouldn't need a parser. You'd need a text editor and some patience.</p>
+
+      <p>It isn't. Let me take a real one apart.</p>
+
+      <h2>The shape of the thing</h2>
+
+      <p>A copybook is a small schema written in COBOL's data-definition sub-language. Here's a genuine one — <code>DTAR020</code>, the output of a 1990s reporting system, dated 19/12/90, which PICASSO carries as a sample because it's real and unforgiving:</p>
+
+      <div class="code-block">
+<pre><span class="cmt">*   RECORD LENGTH IS 27.</span>
+    03  DTAR020-KCODE-STORE-KEY.
+        05 DTAR020-KEYCODE-NO   PIC X(08).
+        05 DTAR020-STORE-NO     PIC S9(03)   COMP-3.
+    03  DTAR020-DATE            PIC S9(07)   COMP-3.
+    03  DTAR020-DEPT-NO         PIC S9(03)   COMP-3.
+    03  DTAR020-QTY-SOLD        PIC S9(9)    COMP-3.
+    03  DTAR020-SALE-PRICE      PIC S9(9)V99 COMP-3.</pre>
+        <span class="cap">The real <code>DTAR020.cbl</code>, exactly as it ships — its own comment tells you the answer: 27.</span>
+      </div>
+
+      <p>Two kinds of line. Some entries have subordinates and no <code>PIC</code> clause of their own — <code>DTAR020-KCODE-STORE-KEY</code> is one; it's a <strong>group item</strong>, a heading that owns the fields indented under it and takes up exactly as many bytes as they do together. Everything with a <code>PIC</code> is an <strong>elementary item</strong>, an actual field holding actual data. The two-digit numbers at the front — <code>03</code>, <code>05</code> — are <strong>level numbers</strong>: they encode the nesting purely by magnitude. A higher number is subordinate to the nearest lower one before it, which is how <code>05</code>s belong to an <code>03</code> without a single bracket. So far, countable.</p>
+
+      <p>Then you hit the <code>PIC</code> clauses, and the counting quietly falls apart.</p>
+
+      <h2>PIC: the part everyone thinks they understand</h2>
+
+      <p>A <code>PIC</code> (picture) clause describes a field's contents one symbol at a time. The vocabulary is small:</p>
+
+      <ul>
+        <li><code>9</code> — a decimal digit position.</li>
+        <li><code>X</code> — any character.</li>
+        <li><code>(n)</code> — repeat the previous symbol <em>n</em> times, so <code>9(7)</code> is seven digits and <code>X(08)</code> is eight characters. Purely shorthand: <code>9(3)</code> and <code>999</code> are the same field.</li>
+        <li><code>V</code> — an <em>implied</em> decimal point. It marks where the decimal sits for arithmetic but occupies <strong>no byte</strong> of its own. <code>S9(9)V99</code> is eleven digits with the point understood two places from the right; there is no <code>.</code> character stored anywhere.</li>
+        <li><code>S</code> — the field is signed. On its own it also takes no byte; the sign has to live <em>somewhere</em>, and where it lives is a rabbit hole I'll come back to.</li>
+      </ul>
+
+      <p>Already there are two ways to miscount before you've even reached the interesting part. The <code>V</code> is invisible — forget it's not a byte and every offset after the field is off by one. The <code>S</code> is worse, because whether it costs a byte depends on a <em>different</em> clause somewhere else on the line.</p>
+
+      <h2>DISPLAY: the one honest case</h2>
+
+      <p>By default a numeric or text field is stored as <strong>DISPLAY</strong>: one byte per digit or character, human-readable, the digit <code>7</code> literally stored as the character <code>7</code>. This is the mental model everyone brings, and it's correct — for DISPLAY. <code>PIC X(08)</code> is eight bytes. <code>PIC 9(5)</code> is five. If every field were DISPLAY, the ruler would work and I'd have nothing to write about.</p>
+
+      <p>The trouble is that storing numbers as text is wasteful, and mainframes have counted bytes since bytes were expensive. So the interesting fields aren't DISPLAY at all.</p>
+
+      <h2>COMP-3: nine digits in five bytes</h2>
+
+      <p>Look back at the copybook. Every numeric field is tagged <code>COMP-3</code> — <strong>packed decimal</strong>, the workhorse numeric format of mainframe data. Packed decimal stores <em>two</em> decimal digits in each byte, one per four-bit nibble, and spends the final nibble on the sign (hex <code>C</code> for positive, <code>D</code> for negative). So the width isn't the digit count — it's the digit count plus one for the sign, divided into pairs and rounded up: <code>ceil((digits + 1) / 2)</code> bytes.</p>
+
+      <p>Run that on <code>DTAR020-QTY-SOLD PIC S9(9)</code>: nine digits, plus a sign nibble, is ten nibbles, is <strong>five bytes</strong>. Not nine. A field a character-counter writes down as nine is a little over half that on disk.</p>
+
+      <div class="pull">
+        <p>The copybook says nine digits. On disk it's five bytes. Everything downstream of that field is wrong by four unless you know the packing rule.</p>
+      </div>
+
+      <p>Now do the whole record the naive way and the honest way, side by side:</p>
+
+      <div class="code-block">
+<pre>field              PIC             <span class="cmt">counted</span>   <span class="hl">actual</span>   offset
+KEYCODE-NO         X(08)  DISPLAY     8       <span class="hl">8</span>      0
+STORE-NO           S9(03) COMP-3      3       <span class="hl">2</span>      8
+DATE               S9(07) COMP-3      7       <span class="hl">4</span>     10
+DEPT-NO            S9(03) COMP-3      3       <span class="hl">2</span>     14
+QTY-SOLD           S9(9)  COMP-3      9       <span class="hl">5</span>     16
+SALE-PRICE         S9(9)V99 COMP-3   11       <span class="hl">6</span>     21
+                                    ----     ----
+                                     41       <span class="hl">27</span></pre>
+        <span class="cap">Count the digits and you get 41. The record is 27 bytes — the number the copybook's own header comment states. Packed decimal accounts for every missing byte.</span>
+      </div>
+
+      <p>Forty-one versus twenty-seven. A human eyeballing this file lays out a 41-byte record, reads the very first COMP-3 field two bytes too wide, and shifts every field after it. The extract still <em>parses</em> — it just returns numbers that are quietly, plausibly wrong. That is the failure mode this entire project is aimed at, and it's baked into the most common numeric format on the platform.</p>
+
+      <h2>Binary COMP: same trap, different arithmetic</h2>
+
+      <p>Packed decimal isn't the only compact form. Plain <code>COMP</code> (also written <code>COMP-4</code>, <code>COMP-5</code>, or <code>BINARY</code>) stores a number as a true binary integer, big-endian, two's-complement — and its width is fixed in steps by the digit count, not by counting characters: 1–4 digits fit in a <strong>2-byte</strong> halfword, 5–9 in a <strong>4-byte</strong> fullword, 10–18 in an <strong>8-byte</strong> doubleword. So <code>PIC S9(4) COMP</code> and <code>PIC S9(1) COMP</code> are both two bytes; <code>PIC 9(9) COMP</code> is four. A different rule from COMP-3, the same lesson: the byte width is a function you have to <em>know</em>, and it has nothing to do with the number of <code>9</code>s you can see.</p>
+
+      <p>(These bytes are raw binary — they are never run through a character table, which matters the moment EBCDIC enters the room.)</p>
+
+      <h2>EBCDIC: even the text isn't the text</h2>
+
+      <p>The <code>PIC X(08)</code> field at the front is DISPLAY text — eight bytes, honest width. But on a real mainframe extract, those eight bytes aren't ASCII. They're <strong>EBCDIC</strong>, IBM's pre-ASCII character encoding, where the letter <code>A</code> is <code>0xC1</code> and the digit <code>1</code> is <code>0xF1</code> — nothing like the ASCII you'd assume. DTAR020's key field holds the value <code>"69684558"</code>. Read those exact bytes as Latin-1, the way any modern tool does by default, and you get <code>öùöøôõõø</code>. Right length, correct offset, complete garbage value.</p>
+
+      <p>So even the one field whose <em>width</em> is honest still needs decoding through the right code page (cp037, in DTAR020's case) — and, crucially, <em>only</em> the text fields. Run the whole record through a code-page translation and you'll corrupt every COMP-3 field, because packed-decimal nibbles aren't characters and don't survive being reinterpreted as any. The encoding has to be applied per field or not at all. That's a distinction a ruler can't even represent.</p>
+
+      <h2>Signs: the digit that's secretly also a sign</h2>
+
+      <p>Back to that <code>S</code>. A signed DISPLAY number has to keep its sign somewhere, and COBOL gives you options that occupy different amounts of space:</p>
+
+      <ul>
+        <li><strong>SIGN IS SEPARATE</strong> — the sign gets its own byte, a literal <code>+</code> or <code>-</code> before or after the digits. <code>PIC S9(7) SIGN IS TRAILING SEPARATE</code> is <em>eight</em> bytes, not seven. (This is the exact clause that trips up CATALOG-74's hand-transcription — a story for <a class="inline" href="picasso-trust-but-verify.html">Part 4</a>.)</li>
+        <li><strong>Overpunch</strong> (zoned, the default when you don't say SEPARATE) — no extra byte at all. The sign is folded into the <em>zone nibble of one of the digits</em>, usually the last. The digit still reads as a digit to anything that ignores the top nibble, but a positive <code>3</code> is stored as the byte for <code>C</code> and a negative <code>3</code> as the byte for <code>L</code>. The value <code>123</code> negative ends in the character <code>L</code>; positive, it can end in <code>C</code> — or in the plain digit itself.</li>
+      </ul>
+
+      <p>An overpunched sign is genuinely invisible to a character count: the field is exactly as wide as its digits, but the last character isn't the digit it looks like. Miss it and you don't shift an offset — you decode a value with the wrong sign, or read a letter where you expected a number. Nothing about the width tells you it's there; only the <code>S</code> and the <em>absence</em> of SEPARATE do.</p>
+
+      <h2>OCCURS and REDEFINES: structure that multiplies and overlaps</h2>
+
+      <p>Two more clauses bend the layout in ways a flat reading can't follow. <strong>OCCURS</strong> repeats an item: <code>05 LINE-ITEM OCCURS 3 TIMES</code> over a 20-byte group is 60 bytes, three copies laid end to end, and if the count itself is stored in another field (<code>OCCURS DEPENDING ON</code>) the record's length isn't even fixed — it's data you have to read first. <strong>REDEFINES</strong> is the opposite: it lays a second interpretation over the <em>same</em> bytes, two field definitions describing one region of storage, so the naive "add up every field" arithmetic double-counts and walks off the end of the record.</p>
+
+      <p>Both are cases where the offset of a field depends on more than the fields before it — on a repeat count, on an overlay, sometimes on a value inside the record. No amount of careful counting gets there, because the thing you'd need to count isn't a length; it's a rule.</p>
+
+      <h2>Why the offsets are computable anyway</h2>
+
+      <p>Here's the payoff, and the reason a parser is the right answer rather than a more careful human. Every single one of these rules is <em>deterministic</em>. Packed-decimal width is a formula. Binary width is a lookup by digit count. The implied decimal is a position, not a byte. EBCDIC is a fixed table. The sign lives in a place the clauses tell you exactly. OCCURS multiplies; REDEFINES overlays. None of it is ambiguous — it's just spread across half a dozen interacting rules that a person applies by hand, in their head, field after field, and gets right almost every time. Almost.</p>
+
+      <p>A compiler doesn't count characters; it applies those rules mechanically and never tires on field forty. PICASSO does the same thing: it reads the copybook the way the compiler would and computes the layout — 27 bytes for DTAR020, packed fields and implied decimals and EBCDIC text all accounted for — instead of asking a human to hold six rules in their head and hope. The information was always fully specified. It just was never one byte per character, and pretending otherwise is where the bugs come from.</p>
+
+      <p>Which raises the obvious question for a tool whose entire job is these offsets: how do you know it got them right? That's the next two posts. First, <a class="inline" href="picasso-let-the-real-files-find-the-bugs.html">what happens when you point it at a real file</a> — and then how you prove the answer against something that isn't yourself.</p>
+
+      <div class="series-next">
+        <p class="label">The series</p>
+        <ol>
+          <li><a class="inline" href="picasso-the-thing-that-should-exist.html">The thing that should already exist</a></li>
+          <li class="done"><b>What's actually inside a copybook</b><span class="tag">you are here</span></li>
+          <li><a class="inline" href="picasso-let-the-real-files-find-the-bugs.html">Let the real files find the bugs</a></li>
+          <li><a class="inline" href="picasso-trust-but-verify.html">Trust, but verify — proving it against a real compiler</a></li>
+          <li><a class="inline" href="picasso-i-didnt-write-the-csharp.html">I didn't write a line of the C#</a></li>
+          <li><a class="inline" href="picasso-the-last-mile-is-a-windows-gui.html">The last mile is a Windows GUI</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="back" href="index.html">&larr; All writing</a>
+    <div class="contact-links">
+      <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>
+      <a href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO</a>
+      <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
+    </div>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) — self-hosted, no cloud provider involved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

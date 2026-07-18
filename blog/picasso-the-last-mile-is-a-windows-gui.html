@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The last mile is a Windows GUI — Jonas Fiers</title>
+<meta name="description" content="PICASSO's engine is done, tested, and portable. Turning it into the OutSystems Forge component it's meant to become runs into a wall that has nothing to do with the code: proprietary, Windows-only GUI tools you can't automate — plus the O11-versus-ODC question.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.jonasfiers.eu/blog/picasso-the-last-mile-is-a-windows-gui.html">
+<link rel="canonical" href="https://www.jonasfiers.eu/blog/picasso-the-last-mile-is-a-windows-gui.html">
+<meta property="og:title" content="The last mile is a Windows GUI">
+<meta property="og:description" content="The engine is done and portable. Shipping it as a Forge component needs proprietary, Windows-only GUI tools that can't be automated — and a choice between O11's Integration Studio and ODC's External Libraries SDK.">
+<meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-08-04">
+<meta property="article:author" content="Jonas Fiers">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The last mile is a Windows GUI">
+<meta name="twitter:description" content="The engine is done and portable. Shipping it as a Forge component needs proprietary, Windows-only GUI tools that can't be automated — and a choice between O11 and ODC.">
+<meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preload" href="../fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="blog.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The last mile is a Windows GUI",
+  "description": "PICASSO's engine is done and portable; shipping it as a Forge component needs proprietary Windows-only GUI tools — plus the O11-versus-ODC question.",
+  "datePublished": "2026-08-04",
+  "author": { "@type": "Person", "name": "Jonas Fiers", "url": "https://www.jonasfiers.eu" },
+  "image": "https://www.jonasfiers.eu/og-image.png",
+  "mainEntityOfPage": "https://www.jonasfiers.eu/blog/picasso-the-last-mile-is-a-windows-gui.html",
+  "isPartOf": { "@type": "Blog", "name": "Notes from the build" }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Jonas Fiers<span>.</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../index.html">Portfolio</a>
+      <a href="index.html">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="article-head">
+      <p class="kicker">
+        <span>PICASSO · Part 6</span>
+        <span class="muted">4 Aug 2026</span>
+        <span class="muted">6 min read</span>
+      </p>
+      <h1>The last mile is a Windows GUI</h1>
+      <p class="standfirst">The parser is done. The engine round-trips real mainframe files and agrees with a real compiler. And it still isn't a Forge component — because the final step out the door runs into proprietary, Windows-only tools that no amount of clean code lets you automate.</p>
+      <p class="byline">By Jonas Fiers · last in a series on PICASSO</p>
+    </div>
+
+    <article class="post">
+
+      <p>Here's an honest place to end a build series: not at a triumphant "shipped," but at the wall. PICASSO does what I set out to make it do. It reads a copybook and derives the byte layout; it decodes and encodes real fixed-width mainframe files; it's validated three independent ways (<a class="inline" href="picasso-trust-but-verify.html">Part 4</a>). All of that is finished, tested, and sitting in a repository as a portable, runnable thing.</p>
+
+      <p>What it is <em>not</em>, yet, is the OutSystems Forge component that the very first post said the world was missing. And the gap between those two states has nothing left to do with the code.</p>
+
+      <h2>What "done" actually means here</h2>
+
+      <p>Everything I could build and verify without proprietary tooling is built and verified. Concretely, the repo stops at the last portable artefact: a built, tested pair of .NET libraries. <code>Picasso.Core</code> is the engine — the parser, the codec, the packed-decimal and EBCDIC handling — with zero OutSystems dependency. <code>Picasso.Extension</code> is the thin layer of action classes that wraps it for OutSystems: <code>ParseCopybook</code>, <code>DecodeRecords</code>, <code>EncodeRecords</code>, and the rest of the surface. Both compile and both pass their tests with nothing but <code>dotnet build</code> and <code>dotnet test</code>. No Windows required to get to here.</p>
+
+      <p>That was a deliberate line. Both projects target <code>netstandard2.0</code> on purpose — the one framework that a plain cross-platform <code>dotnet build</code> can produce <em>and</em> that a Windows Integration Studio project can consume, with no second implementation. The whole thing is arranged so that the portable part is genuinely portable and the non-portable part is as small as it can possibly be.</p>
+
+      <h2>The part you can't automate</h2>
+
+      <p>But an OutSystems Extension isn't a DLL. It's an artefact you assemble <em>in Integration Studio</em> — a Windows-only, GUI-only tool that isn't scriptable. You open it, create the Extension, define each action, point it at the compiled DLLs, and build. There's no command-line path, no config file I can commit that turns the libraries into the packaged component. The same is true one step further along:</p>
+
+      <ul>
+        <li><strong>The demo app</strong> that shows the parser working — paste a copybook, see the layout table, see decoded records — is built in <strong>Service Studio</strong>, OutSystems' visual development environment. Also Windows-centric, also a GUI, also not something you generate from a script.</li>
+        <li><strong>The Forge submission itself</strong> happens on a web form behind an OutSystems account login. Filling in the listing, the category, the icon, the screenshots — none of that is automatable from outside a real session there.</li>
+      </ul>
+
+      <p>So this is where a project built and validated entirely on a Linux box hits something it can't push through by being more finished. Not a hard technical problem — a <em>tooling boundary</em>. The honest move was to recognise it and stop cleanly at it, rather than fake a half-step across. What I could do instead was write down the exact manual steps: the Integration Studio wiring, the demo app's screens and structures, and the Forge submission checklist — each grounded in OutSystems' own published guidance — so that when I (or someone with the right environment) sits down at a Windows machine, the crossing is mechanical rather than exploratory.</p>
+
+      <div class="pull">
+        <p>Not a hard problem — a tooling boundary. The engine is portable on purpose; the wall is a GUI, and you don't argue a GUI into being scriptable.</p>
+      </div>
+
+      <h2>And which OutSystems, anyway: O11 or ODC</h2>
+
+      <p>There's a second reason to pause before charging at that wall, and it's a genuine fork rather than a formality. "OutSystems" is now two platforms. Integration Studio Extensions — the entire path above — are an <strong>OutSystems 11</strong> mechanism. The newer <strong>OutSystems Developer Cloud</strong> (ODC) doesn't run Integration Studio at all. So the component I've been describing reaches O11 users and no one on ODC.</p>
+
+      <p>Reaching ODC isn't a checkbox on the same submission — it's a <em>second</em> wrapper. ODC's equivalent of an Extension is an <strong>External Library</strong>, built with a standalone <strong>External Libraries SDK</strong>: a NuGet-based toolkit that decorates plain C# with attributes and packages it as a ZIP, rather than a GUI tool generating stubs. Notably, that SDK is <em>not</em> a Windows GUI — it's the more automatable of the two paths.</p>
+
+      <p>And here's where the day-one design choice pays off. Because <code>Picasso.Core</code> has no OutSystems dependency, it's the same engine either way. An ODC version wouldn't be a rewrite of the parser or codec; it'd be a third small wrapper project alongside <code>Picasso.Extension</code>, decorating the same core with the SDK's attributes. The hard part — getting the byte offsets right — is already done and shared. The wrappers are thin by construction.</p>
+
+      <p>Whether to build that second wrapper is a real yes/no, not a default. It's worth deciding on purpose rather than sliding into "O11 only" by omission — which is exactly why I've written it down as an open question instead of quietly picking one.</p>
+
+      <h2>Where that leaves it</h2>
+
+      <p>So the series ends with the engine finished and the storefront not yet open, and I'm oddly comfortable with that as a stopping point. The interesting, hard, verifiable work — turning fifty years of <code>PIC</code>-clause rules into byte offsets you can actually trust — is the part that's complete. What's left is packaging: real, necessary, but bounded, documented, and gated on tools and an account rather than on any question I don't know the answer to.</p>
+
+      <p>If you've read the whole way here: the point of PICASSO was never really the Forge listing. It was to build, and prove, the thing that should already have existed — a parser that reads the copybook so a human doesn't have to reach for the ruler. That thing exists now, it's right, and I can show you exactly why it's right. The last mile is a Windows GUI and an afternoon. The first five were the ones worth writing about.</p>
+
+      <div class="series-next">
+        <p class="label">The series</p>
+        <ol>
+          <li><a class="inline" href="picasso-the-thing-that-should-exist.html">The thing that should already exist</a></li>
+          <li><a class="inline" href="picasso-inside-a-copybook.html">What's actually inside a copybook</a></li>
+          <li><a class="inline" href="picasso-let-the-real-files-find-the-bugs.html">Let the real files find the bugs</a></li>
+          <li><a class="inline" href="picasso-trust-but-verify.html">Trust, but verify — proving it against a real compiler</a></li>
+          <li><a class="inline" href="picasso-i-didnt-write-the-csharp.html">I didn't write a line of the C#</a></li>
+          <li class="done"><b>The last mile is a Windows GUI</b><span class="tag">you are here</span></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="back" href="index.html">&larr; All writing</a>
+    <div class="contact-links">
+      <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>
+      <a href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO</a>
+      <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
+    </div>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) — self-hosted, no cloud provider involved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

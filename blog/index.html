@@ -27,11 +27,11 @@
   ============================================================================
   BLOG SERIES PLAN — "PICASSO: reading a copybook so a human doesn't have to"
   ============================================================================
-  A 5-part arc (with an optional 6th), progressing from the why, through the
-  technical substance, the philosophy, the validation, and finally the method.
-  Only post 1 is written and published. The rest are drafted here as the map.
+  A 6-part arc, progressing from the why, through the technical substance,
+  the philosophy, the validation, the method, and finally the last mile.
+  All six posts are now drafted; the outline below is kept as the map.
 
-  1. The thing that should already exist                        [PUBLISHED]
+  1. The thing that should already exist                        [DRAFTED]
      The goal, and why I picked it. The OutSystems Forge has no COBOL
      connector, so every mainframe integration gets hand-rolled; CATALOG-74's
      specs.js is that hand-transcription in miniature. Nobody built the parser
@@ -61,7 +61,7 @@
      that division of labour is good at, where it needs a human holding the
      spec, and why the honest version is more interesting than pretending.
 
-  (6, optional) The last mile is a Windows GUI
+  6. The last mile is a Windows GUI
      Packaging Picasso.Core into an Integration Studio Extension and getting
      it to Forge — the part you can't automate, and the O11-vs-ODC question.
   ============================================================================
@@ -101,23 +101,55 @@
         <p>The OutSystems Forge has a connector for almost everything — except COBOL. So every mainframe integration gets hand-rolled by someone reading a copybook and typing byte offsets into a config file. I got tired of watching that, and built the parser nobody had bothered to write.</p>
       </a>
 
-      <div class="post-card upcoming" aria-disabled="true">
+      <a class="post-card" href="picasso-inside-a-copybook.html">
         <div class="kicker">
           <span>PICASSO · Part 2</span>
-          <span class="soon">Coming soon</span>
+          <span class="muted">21 Jul 2026</span>
+          <span class="muted">8 min read</span>
         </div>
         <h2>What's actually inside a copybook</h2>
-        <p>PIC clauses, implied decimals, packed decimal, EBCDIC, OCCURS, REDEFINES — the anatomy of a byte layout, and why a human counting characters gets it wrong.</p>
-      </div>
+        <p>PIC clauses, implied decimals, packed decimal, binary COMP, EBCDIC, signs, OCCURS and REDEFINES — the anatomy of a byte layout, and why a human counting characters gets it wrong.</p>
+      </a>
 
-      <div class="post-card upcoming" aria-disabled="true">
+      <a class="post-card" href="picasso-let-the-real-files-find-the-bugs.html">
         <div class="kicker">
           <span>PICASSO · Part 3</span>
-          <span class="soon">Coming soon</span>
+          <span class="muted">24 Jul 2026</span>
+          <span class="muted">8 min read</span>
         </div>
         <h2>Let the real files find the bugs</h2>
         <p>Fail loudly, never silently miscompute. How one genuine 1990s mainframe extract exposed four gaps that every synthetic test had missed.</p>
-      </div>
+      </a>
+
+      <a class="post-card" href="picasso-trust-but-verify.html">
+        <div class="kicker">
+          <span>PICASSO · Part 4</span>
+          <span class="muted">28 Jul 2026</span>
+          <span class="muted">8 min read</span>
+        </div>
+        <h2>Trust, but verify</h2>
+        <p>How do you trust a parser whose whole job is byte offsets? Prove it three independent ways that don't quote each other — a real compiler, a third party's published values, and a human's hand-transcription.</p>
+      </a>
+
+      <a class="post-card" href="picasso-i-didnt-write-the-csharp.html">
+        <div class="kicker">
+          <span>PICASSO · Part 5</span>
+          <span class="muted">31 Jul 2026</span>
+          <span class="muted">9 min read</span>
+        </div>
+        <h2>I didn't write a line of the C#</h2>
+        <p>The honest division of labour: I set the problem, the scope, and the real-data checks; an AI wrote the .NET engine under my direction. What each side actually brought.</p>
+      </a>
+
+      <a class="post-card" href="picasso-the-last-mile-is-a-windows-gui.html">
+        <div class="kicker">
+          <span>PICASSO · Part 6</span>
+          <span class="muted">4 Aug 2026</span>
+          <span class="muted">6 min read</span>
+        </div>
+        <h2>The last mile is a Windows GUI</h2>
+        <p>The engine is done and portable — but shipping it as a Forge component runs into proprietary, Windows-only tools you can't automate, plus the O11-versus-ODC question.</p>
+      </a>
 
     </div>
   </div>

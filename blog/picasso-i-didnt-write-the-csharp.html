@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I didn't write a line of the C# — Jonas Fiers</title>
+<meta name="description" content="The honest version of how PICASSO got built. I identified the problem, set the scope, and validated every layout against real mainframe data — but the .NET engine was written by an AI under my direction. Here's what that division of labour was actually like.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.jonasfiers.eu/blog/picasso-i-didnt-write-the-csharp.html">
+<link rel="canonical" href="https://www.jonasfiers.eu/blog/picasso-i-didnt-write-the-csharp.html">
+<meta property="og:title" content="I didn't write a line of the C#">
+<meta property="og:description" content="The honest version: I set the problem, the scope, and validated every layout against real data — an AI wrote the .NET engine under my direction. What each side actually brought.">
+<meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-07-31">
+<meta property="article:author" content="Jonas Fiers">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="I didn't write a line of the C#">
+<meta name="twitter:description" content="The honest version: I set the problem, the scope, and validated every layout against real data — an AI wrote the .NET engine under my direction.">
+<meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preload" href="../fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="blog.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "I didn't write a line of the C#",
+  "description": "The honest division of labour behind PICASSO: a human holding the spec and the real-data checks, an AI writing the implementation under direction.",
+  "datePublished": "2026-07-31",
+  "author": { "@type": "Person", "name": "Jonas Fiers", "url": "https://www.jonasfiers.eu" },
+  "image": "https://www.jonasfiers.eu/og-image.png",
+  "mainEntityOfPage": "https://www.jonasfiers.eu/blog/picasso-i-didnt-write-the-csharp.html",
+  "isPartOf": { "@type": "Blog", "name": "Notes from the build" }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Jonas Fiers<span>.</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../index.html">Portfolio</a>
+      <a href="index.html">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="article-head">
+      <p class="kicker">
+        <span>PICASSO · Part 5</span>
+        <span class="muted">31 Jul 2026</span>
+        <span class="muted">9 min read</span>
+      </p>
+      <h1>I didn't write a line of the C#</h1>
+      <p class="standfirst">I've spent four posts saying "PICASSO computes" and "the parser refuses." Time to be precise about the pronoun. I designed this thing, scoped it, and checked its every answer against real mainframe data — but the .NET engine was written by an AI. Here's the honest shape of that collaboration.</p>
+      <p class="byline">By Jonas Fiers · fifth in a series on PICASSO</p>
+    </div>
+
+    <article class="post">
+
+      <p>I flagged this at the end of the first post and I'd rather state it plainly than let it sit as an implication: I did not write the C# in PICASSO. The parser, the codec, the packed-decimal arithmetic, the EBCDIC table, the action classes — the implementation was written by an AI (Claude, from Anthropic) working under my direction. I set the problem and the scope, I made the calls about what's in and what's out, and I validated every layout it produced against real data. The typing of the code was not the part I did.</p>
+
+      <p>I think that division is genuinely interesting, and I think the interesting version is the accurate one — not "I built a COBOL parser" with an asterisk, and not "the AI built it while I watched," which is equally false. Let me describe what actually happened.</p>
+
+      <h2>What I actually did</h2>
+
+      <p>The parts that were mine are the parts that don't look like code.</p>
+
+      <p><strong>Deciding it was worth building at all.</strong> The whole origin of this project (<a class="inline" href="picasso-the-thing-that-should-exist.html">Part 1</a>) is a judgment: that a hand-transcribed byte layout in a toy expense app pointed at a real, unglamorous, unsolved gap in the OutSystems ecosystem. No model told me that was worth six blog posts of effort. Noticing which problems are worth solving is not a thing you can delegate, because it depends on knowing the domain you work in and what annoys the people in it.</p>
+
+      <p><strong>Setting the scope, and defending it.</strong> A copybook can contain a great deal, and the fastest way to never ship is to try to support all of it. The line — <code>DISPLAY</code>, COMP-3, binary <code>COMP</code>, EBCDIC cp037, fixed-count OCCURS, REDEFINES, single-level ODO <em>in</em>; hex-float <code>COMP-1</code>/<code>COMP-2</code>, DBCS, EBCDIC variants beyond cp037 explicitly <em>out</em> — is a series of deliberate calls about what real files actually contain versus what merely exists in the standard. Those calls are mine, and most of them are calls to <em>not</em> build something. Left to its own momentum, a capable code generator will happily implement the rare thing you'll never see in a real extract; someone has to keep saying "that's out of scope, and here's the named error it should throw instead."</p>
+
+      <div class="pull">
+        <p>The AI's instinct is to make things work. Mine was to decide which things were worth making work — and which should fail loudly instead.</p>
+      </div>
+
+      <p><strong>The insistence on real data.</strong> The single most consequential decision in the project was the cheapest to state: don't stop at synthetic test copybooks — go find a real one and refuse to clean it up. That's what brought in DTAR020 and the four gaps it exposed (<a class="inline" href="picasso-let-the-real-files-find-the-bugs.html">Part 3</a>), and it's what turned "the tests pass" into "the tests pass <em>and</em> a genuine 1990s mainframe file round-trips byte-for-byte." A model is very good at making a test suite green. It is not, on its own, driven to go get the one file that will embarrass the test suite. That drive — the reflex to distrust a clean pass and find reality to check it against — was the human contribution that mattered most.</p>
+
+      <p><strong>Being the verifier.</strong> Every claim in <a class="inline" href="picasso-trust-but-verify.html">the last post</a> — the compiler oracle, the third-party published values, the hand-transcription parity — is a check I decided the project had to pass and then confirmed it did. When PICASSO disagreed with my own old hand-count on <code>NET-BALANCE</code>, working out that the <em>parser</em> was right and I'd cut the corner was a human sitting with two answers and deciding which one to trust. The AI can produce a layout; it can't independently decide the layout is trustworthy enough to bet a report on.</p>
+
+      <h2>What the AI actually did</h2>
+
+      <p>And then — the implementation, which is not a small thing to wave away. Given a clear spec and a hard boundary, the model wrote correct, idiomatic C#: the offset arithmetic, the nibble-level COMP-3 packing, a cp037 table generated from .NET's own code page rather than hand-transcribed, the fixed-width codec, the whole test suite. Fast. The velocity is real and I won't pretend otherwise — features that I'd have budgeted days for, in a language and a domain I don't live in day to day, took a fraction of that. Packed-decimal encode/decode written and unit-tested before I'd have finished re-reading the format spec.</p>
+
+      <p>It's also good at the kind of breadth that's tedious for a human: running the parser against a corpus of several hundred real copybooks, triaging the failures, turning each rejected construct into a ranked list of what to support next. That's exactly the sort of patient, wide, mechanical work that a person does slowly and grudgingly and a model does quickly and without complaint.</p>
+
+      <p>But notice what all of that has in common: it's execution against a target someone else is holding. The spec, the scope boundary, the definition of "correct," the decision to trust the result — those came from outside the model. Take them away and the velocity stops being an asset, because fast movement toward an unverified goal is just fast movement toward a plausible wrong answer, which for this particular tool is the one outcome we spent the whole project trying to prevent.</p>
+
+      <h2>The process, honestly</h2>
+
+      <p>The mechanics are worth describing, because they're the part that made me trust the output. Most of the work ran on a homelab box, and the pattern for anything non-trivial was two AI agents, not one. One agent implemented a feature in the working clone. A <em>second</em>, separate agent — a fresh checkout, no access to the first one's reasoning — reviewed it against a checklist I wrote for that specific feature: not "review this," but "for OCCURS, check the offset arithmetic and whether the harder rejected case could be silently evaded." The reviewer re-ran the tests itself, hand-checked the arithmetic, and reported findings ranked by severity. Then I read the review and decided — fix it, keep it, or ask a real question — rather than trusting either agent's account of its own work.</p>
+
+      <p>That structure exists because a single agent grading its own homework has the same blind spot a single developer's test suite does: it's confident precisely where it's wrong. Splitting implement from review, and keeping a human at the point where the two disagree, is the same "verify against something that isn't yourself" principle from Part 4, applied to the build process instead of the parser. Every architecturally-significant feature also had to clear the GnuCOBOL oracle before it merged. The AI wrote the code; a real compiler and a second agent and I decided whether it was allowed to stay.</p>
+
+      <p>It wasn't frictionless. There were moments the implementing agent drifted toward the adjacent, harder problem I'd explicitly walled off — scope creep is apparently not a uniquely human failing — and moments a "done" pane turned out to be mid-thought. The commit history, not the agent's say-so, was the source of truth throughout. But the loop held: describe a feature and its hard boundary, let it be built, review it independently, check it against the compiler, decide. Across the whole project, that's dozens of iterations of the same shape.</p>
+
+      <h2>Why say all this</h2>
+
+      <p>Because the alternative is dishonest, and because the honest version is more useful. There's a temptation, right now, to either hide the AI's role — take the credit, imply I typed it all — or to over-tell it, and imply the machine did it alone while I supervised. Both are wrong, and both are boring. The true story is a specific division of labour: a human bringing judgment, domain knowledge, scope discipline, and an insistence on real-world proof; a model bringing implementation speed and tireless breadth. Each was load-bearing. Remove the human and you get a fast, confident, unverified parser — the worst possible thing for handling financial records. Remove the AI and you get a good idea I probably wouldn't have found the weeks to build in C# and .NET, a stack I don't work in daily.</p>
+
+      <p>What I'd push back on, from either direction, is the framing that one of these contributions is the "real" one. The code is real work and the model did it well. The judgment is real work and no model did it. PICASSO is what it is because both were present — and the part I'm least willing to give up credit for isn't a line of code. It's the decision, made and re-made at every step, to not trust the clean answer until something outside the system agreed with it.</p>
+
+      <p>That's the project, really. One more post to go — the honest note on the part of this that <em>can't</em> be finished from a Linux box at all, no matter who or what is writing the code.</p>
+
+      <hr>
+
+      <p style="font-size:15px;color:var(--text-dim);">In the spirit of the post: this write-up of the build was itself drafted with AI assistance and edited by me for accuracy and voice. Every technical claim in the series is checkable against the <a class="inline" href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">PICASSO repository</a> — the README, the changelog, and the git history, where the authorship of every commit is visible rather than left to infer.</p>
+
+      <div class="series-next">
+        <p class="label">The series</p>
+        <ol>
+          <li><a class="inline" href="picasso-the-thing-that-should-exist.html">The thing that should already exist</a></li>
+          <li><a class="inline" href="picasso-inside-a-copybook.html">What's actually inside a copybook</a></li>
+          <li><a class="inline" href="picasso-let-the-real-files-find-the-bugs.html">Let the real files find the bugs</a></li>
+          <li><a class="inline" href="picasso-trust-but-verify.html">Trust, but verify — proving it against a real compiler</a></li>
+          <li class="done"><b>I didn't write a line of the C#</b><span class="tag">you are here</span></li>
+          <li><a class="inline" href="picasso-the-last-mile-is-a-windows-gui.html">The last mile is a Windows GUI</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="back" href="index.html">&larr; All writing</a>
+    <div class="contact-links">
+      <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>
+      <a href="https://github.com/jonasfiers/PICASSO" target="_blank" rel="noopener">github.com/jonasfiers/PICASSO</a>
+      <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
+    </div>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) — self-hosted, no cloud provider involved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
