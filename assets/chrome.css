@@ -24,6 +24,9 @@
   align-items:center;
   justify-content:space-between;
   height:60px;
+  /* explicit so the header bar is uniform on every page regardless of each
+     page's own .wrap width (homepage and blog now both use 760, see below) */
+  max-width:760px;
 }
 .brand{
   font-family:var(--display);
@@ -48,12 +51,14 @@
   text-decoration:none;
   transition:color 0.15s ease;
 }
-/* section colour language: neutral grey at rest, section colour only on hover
-   or when this is the current section (portfolio = lime, writing = pink) */
-.nav-links a.to-portfolio:hover,
-.nav-links a.to-portfolio[aria-current="page"]{color:var(--lime);}
-.nav-links a.to-writing:hover,
-.nav-links a.to-writing[aria-current="page"]{color:var(--pink);}
+/* neutral grey at rest; the section you're in stays lit across ALL its pages
+   (via the section-<name> class on <header>), and hovering any link lights it
+   in its colour (portfolio = lime, writing = pink) */
+.site-header.section-portfolio .to-portfolio,
+.nav-links a.to-portfolio:hover{color:var(--lime);}
+.site-header.section-writing .to-writing,
+.nav-links a.to-writing:hover{color:var(--pink);}
+/* underline marks the exact landing/home page of a section */
 .nav-links a[aria-current="page"]{text-decoration:underline;text-underline-offset:4px;}
 
 /* FOOTER (slim, blog pages) */

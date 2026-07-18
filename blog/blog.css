@@ -35,7 +35,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 a{color:inherit;}
-.wrap{max-width:720px;margin:0 auto;padding:0 24px;}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px;}
 
 /* Site header + slim footer chrome now live in ../assets/chrome.css.
    The footer's .contact-links styling stays here (page-local: the class name
