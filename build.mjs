@@ -16,8 +16,8 @@
  *
  * It is idempotent: running it twice makes no further change.
  *
- * Styling for the chrome lives in assets/chrome.css; the design tokens in
- * assets/tokens.css. This script only manages the HTML regions, not the CSS.
+ * Styling for the chrome (and the whole site) lives in the single stylesheet
+ * assets/site.css. This script only manages the HTML regions, not the CSS.
  *
  * Usage:  node build.mjs
  */

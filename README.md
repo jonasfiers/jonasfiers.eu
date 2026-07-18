@@ -2,14 +2,13 @@
 
 My portfolio, styled as a Cypher query. Single-page, framework-free, self-hosted.
 
-No framework and no dependencies — the homepage is one `index.html` with inline CSS and a small vanilla JS snippet for the hero's node-network animation. The whole site is meant to be readable as easily as it's served: view source and you're looking at the actual page. The one concession to DRY is a tiny zero-dependency Node script (`build.mjs`) that keeps the shared header/footer chrome in sync across the pages — see "Building the site" below. The pages it touches remain complete, hand-viewable, deployable HTML; there is no bundler and nothing gets compiled away.
+No framework and no dependencies — the homepage is one `index.html` linking a single shared stylesheet, plus a small vanilla JS snippet for the hero's node-network animation. The whole site is meant to be readable as easily as it's served: view source and you're looking at the actual page. The one concession to DRY is a tiny zero-dependency Node script (`build.mjs`) that keeps the shared header/footer chrome in sync across the pages — see "Building the site" below. The pages it touches remain complete, hand-viewable, deployable HTML; there is no bundler and nothing gets compiled away.
 
 ## Structure
 
 - **`index.html`** — the homepage (portfolio)
-- **`blog/`** — the writing section: `index.html` (landing) + the PICASSO post series, sharing `blog/blog.css`
-- **`assets/tokens.css`** — the design tokens (`:root` custom properties), shared by every page
-- **`assets/chrome.css`** — styling for the shared header/nav and slim blog footer
+- **`blog/`** — the writing section: `index.html` (landing) + the PICASSO post series
+- **`assets/site.css`** — the single stylesheet for the whole site: `@font-face` declarations, `:root` design tokens, the unified base/reset, the shared header/footer chrome, and the homepage + blog/article rules. Linked by every page
 - **`build.mjs`** — the chrome-sync build (see "Building the site")
 - **`favicon.svg`**, **`fonts/`** — self-hosted assets, no external font/CDN requests
 - **`og-image.png`** / **`og-template.html`** — the social-share card; `og-template.html` is the editable source, see below for how to regenerate it
@@ -49,8 +48,8 @@ node build.mjs
 It rewrites each page's chrome region in place and reports what changed. It is
 **idempotent** — running it a second time makes no further change — so it is safe
 to run any time. The rest of each page (its actual content) is never touched;
-only the delimited chrome regions are managed. Styling for the chrome lives in
-`assets/chrome.css` and the shared tokens in `assets/tokens.css`; the build only
+only the delimited chrome regions are managed. Styling for the chrome — and the
+whole site — lives in the single stylesheet `assets/site.css`; the build only
 manages the HTML regions, not the CSS.
 
 **The built HTML is what gets served.** There is no separate output directory —
@@ -62,7 +61,7 @@ the pages in the repo are the deployed pages. Commit them after running the buil
    to the new filename and write the article body. Keep the
    `<!-- @@header@@ -->…<!-- @@/header@@ -->` and
    `<!-- @@footer@@ -->…<!-- @@/footer@@ -->` markers, and the
-   `assets/tokens.css` + `assets/chrome.css` + `blog.css` `<link>`s, in place.
+   `../assets/site.css` `<link>`, in place.
 2. Add the file to the `PAGES` manifest in `build.mjs`
    (`{ file: 'blog/…​.html', loc: 'blog', section: 'writing', footer: 'post' }`).
 3. Run `node build.mjs` to sync the chrome, and add a card for it on the blog
