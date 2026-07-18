@@ -89,6 +89,14 @@ function footerHTML(page) {
 </footer>`;
 }
 
+/* Per-section favicon: portfolio pages get the lime :JF, writing pages the pink
+   one. Lives in <head>, so it's a managed region like the header/footer. */
+function faviconHTML(page) {
+  const prefix = page.loc === 'root' ? '' : '../';
+  const file = page.section === 'writing' ? 'favicon-writing.svg' : 'favicon.svg';
+  return `<link rel="icon" type="image/svg+xml" href="${prefix}${file}">`;
+}
+
 /* ── REGION SYNC ────────────────────────────────────────────────────────────*/
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -122,6 +130,10 @@ for (const page of PAGES) {
   const h = syncRegion(html, 'header', headerHTML(page));
   if (!h.present) problems.push(`${page.file}: missing <!-- @@header@@ --> region`);
   html = h.html;
+
+  const fav = syncRegion(html, 'favicon', faviconHTML(page));
+  if (!fav.present) problems.push(`${page.file}: missing <!-- @@favicon@@ --> region`);
+  html = fav.html;
 
   if (page.footer !== 'none') {
     const f = syncRegion(html, 'footer', footerHTML(page));
