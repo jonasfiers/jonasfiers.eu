@@ -24,6 +24,10 @@
 <link rel="preload" href="fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/site.css">
+<!-- Home header reveals only after the hero. Gate the CSS before first paint so
+     there is no header flash on load; the observer at the end of <body> removes
+     this class if IntersectionObserver is unavailable, keeping the nav reachable. -->
+<script>document.documentElement.classList.add('reveal-header');</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -451,6 +455,21 @@ READY
       lastW = w;
     });
   }
+
+  // Header reveal: keep the header hidden over the hero, slide it in once the hero
+  // has scrolled fully past. If IntersectionObserver isn't available, un-gate so the
+  // header stays visible (nav always reachable).
+  (function(){
+    var header = document.querySelector('.site-header');
+    var hero = document.querySelector('.hero');
+    if(!header || !hero || !('IntersectionObserver' in window)){
+      document.documentElement.classList.remove('reveal-header');
+      return;
+    }
+    new IntersectionObserver(function(entries){
+      header.classList.toggle('revealed', !entries[0].isIntersecting);
+    }, { threshold: 0 }).observe(hero);
+  })();
 </script>
 
 </body>
