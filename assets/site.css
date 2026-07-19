@@ -95,24 +95,6 @@ a{color:inherit;}
   background:rgba(18,23,43,0.82);
   backdrop-filter:blur(8px);
 }
-/* Home page only: the header hides over the hero and slides in once you scroll
-   past it. `reveal-header` is set (before first paint) by index.html; with JS off
-   it is never set, so the header stays its normal sticky self and the nav is always
-   reachable. Fixed = out of flow, so the hero fills the very top; `.revealed`
-   (toggled by the hero IntersectionObserver) brings it back with a soft shadow. */
-html.reveal-header body.home .site-header{
-  position:fixed;
-  left:0; right:0; top:0;
-  transform:translateY(-100%);
-  transition:transform .28s ease, box-shadow .28s ease;
-}
-html.reveal-header body.home .site-header.revealed{
-  transform:translateY(0);
-  box-shadow:0 8px 24px rgba(0,0,0,0.30);
-}
-@media (prefers-reduced-motion: reduce){
-  html.reveal-header body.home .site-header{ transition:none; }
-}
 .site-header .wrap{
   display:flex;
   align-items:center;
