@@ -25,7 +25,7 @@ Two audiences: **OutSystems/enterprise** (the adopters — LinkedIn + OutSystems
 >
 > Search the Forge for "cobol" or "mainframe" and you get nothing. So when an OutSystems team needs to read a mainframe extract, they do the only thing left: open the copybook and count byte offsets by hand into a config — the same fragile transcription the rest of the world automated decades ago. (The .NET copybook parsers that do exist? Unmaintained, undocumented, and not something you'd stake a financial record on.)
 >
-> So I built the piece that was missing: a native .NET copybook parser, packaged for OutSystems, that reads the `.cpy` and derives the whole byte layout itself — COMP-3, EBCDIC, signs, OCCURS, REDEFINES — and I validated every layout against a real COBOL compiler (GnuCOBOL) and a genuine 1990s mainframe file.
+> So I built the piece that was missing: a native .NET copybook parser, packaged for OutSystems, that reads the `.cpy` and derives the whole byte layout itself — COMP-3, EBCDIC, signs, OCCURS, REDEFINES — and I cross-checked the layouts against a real COBOL compiler (GnuCOBOL) and round-tripped a genuine 1990s mainframe file.
 >
 > Writing the whole build up as a series, starting with why this specific gap was worth closing. (There's also an honest twist about who wrote the code — Part 5.)
 >
@@ -48,9 +48,9 @@ Two audiences: **OutSystems/enterprise** (the adopters — LinkedIn + OutSystems
 >
 > Let me get the obvious objection out of the way first, because you'd be right to raise it: **copybook parsing is not a new problem.** JRecord and cb2xml have done it in Java for 20 years, Cobrix does it on Spark, every COBOL compiler does it. I didn't invent anything.
 >
-> The gap I hit is narrow and platform-specific: I work in OutSystems (a .NET-based low-code platform), and there's no COBOL connector in its marketplace — reaching JRecord et al. from there means standing up a separate Java service beside your app. The .NET copybook parsers on NuGet are unmaintained, undocumented, mostly structure-only (not validated decoders), and none is packaged for the platform. So OutSystems teams hand-roll it. PICASSO is a native .NET, MIT-licensed, zero-dependency parser built to be that missing extension.
+> The gap I hit is narrow and platform-specific: I work in OutSystems (a .NET-based low-code platform), and there's no COBOL connector in its marketplace — reaching JRecord et al. from there means standing up a separate Java service beside your app. The .NET copybook parsers on NuGet are unmaintained, undocumented, mostly structure-only (not validated decoders), and none is packaged for the platform. So OutSystems teams hand-roll it. PICASSO is a native .NET, MIT-licensed, zero-OutSystems-dependency parser built to be that missing extension.
 >
-> Two honest caveats: (1) it's the engine + Integration Studio action classes, **not yet a packaged Forge extension** — today it's a library; (2) **I didn't write the C#** — I picked the problem, set scope, and validated every layout, but the implementation was AI-written under my direction, and the write-up is candid about that.
+> Two honest caveats: (1) it's the engine + Integration Studio action classes, **not yet a packaged Forge extension** — today it's a library; (2) **I didn't write the C#** — I picked the problem, set scope, and did the validation, but the implementation was AI-written under my direction, and the write-up is candid about that.
 >
 > The part I'd point at: validation. Layouts are diffed against what GnuCOBOL computes, and a real DTAR020 extract round-trips byte-for-byte against values a third-party tool published. Happy to answer anything.
 
@@ -68,7 +68,7 @@ Two audiences: **OutSystems/enterprise** (the adopters — LinkedIn + OutSystems
 >
 > 4/ So I built the missing piece: a native .NET parser that reads the .cpy and derives the whole layout — COMP-3, EBCDIC, signs, OCCURS, REDEFINES — and decodes the real records.
 >
-> 5/ The part I care about most: I validated every layout against a real COBOL compiler (GnuCOBOL) and a genuine 1990s mainframe file. Most parsers hand you a layout; almost none prove it's right.
+> 5/ The part I care about most: I cross-checked the layouts against a real COBOL compiler (GnuCOBOL) and round-tripped a genuine 1990s mainframe file. Most parsers hand you a layout; almost none prove it's right.
 >
 > 6/ Twist: I didn't write the C#. I found the problem, set scope, validated it — an AI wrote it under my direction. Part 1: [URL] · new part every Tuesday. #COBOL #dotnet #OutSystems
 

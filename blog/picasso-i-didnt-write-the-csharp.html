@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>I didn't write a line of the C# — Jonas Fiers</title>
-<meta name="description" content="The honest version of how PICASSO got built. I identified the problem, set the scope, and validated every layout against real mainframe data — but the .NET engine was written by an AI under my direction. Here's what that division of labour was actually like.">
+<meta name="description" content="The honest version of how PICASSO got built. I identified the problem, set the scope, and checked the layouts against a real COBOL compiler (GnuCOBOL) and a genuine 1990s mainframe file — but the .NET engine was written by an AI under my direction. Here's what that division of labour was actually like.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.jonasfiers.eu/blog/picasso-i-didnt-write-the-csharp.html">
 <link rel="canonical" href="https://www.jonasfiers.eu/blog/picasso-i-didnt-write-the-csharp.html">
 <meta property="og:title" content="I didn't write a line of the C#">
-<meta property="og:description" content="The honest version: I set the problem, the scope, and validated every layout against real data — an AI wrote the .NET engine under my direction. What each side actually brought.">
+<meta property="og:description" content="The honest version: I set the problem, the scope, and checked the layouts against a real COBOL compiler and a genuine mainframe file — an AI wrote the .NET engine under my direction. What each side actually brought.">
 <meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="article:published_time" content="2026-07-21">
+<meta property="article:published_time" content="2026-08-18">
 <meta property="article:author" content="Jonas Fiers">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="I didn't write a line of the C#">
-<meta name="twitter:description" content="The honest version: I set the problem, the scope, and validated every layout against real data — an AI wrote the .NET engine under my direction.">
+<meta name="twitter:description" content="The honest version: I set the problem, the scope, and checked the layouts against a real COBOL compiler and a genuine mainframe file — an AI wrote the .NET engine under my direction.">
 <meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
 <!-- @@favicon@@ -->
 <link rel="icon" type="image/svg+xml" href="../favicon-writing.svg">
@@ -32,7 +32,7 @@
   "@type": "BlogPosting",
   "headline": "I didn't write a line of the C#",
   "description": "The honest division of labour behind PICASSO: a human holding the spec and the real-data checks, an AI writing the implementation under direction.",
-  "datePublished": "2026-07-21",
+  "datePublished": "2026-08-18",
   "author": { "@type": "Person", "name": "Jonas Fiers", "url": "https://www.jonasfiers.eu" },
   "image": "https://www.jonasfiers.eu/og-image.png",
   "mainEntityOfPage": "https://www.jonasfiers.eu/blog/picasso-i-didnt-write-the-csharp.html",
@@ -63,13 +63,13 @@
         <span class="muted">9 min read</span>
       </p>
       <h1>I didn't write a line of the C#</h1>
-      <p class="standfirst">I've spent four posts saying "PICASSO computes" and "the parser refuses." Time to be precise about the pronoun. I designed this thing, scoped it, and checked its every answer against real mainframe data — but the .NET engine was written by an AI. Here's the honest shape of that collaboration.</p>
+      <p class="standfirst">I've spent four posts saying "PICASSO computes" and "the parser refuses." Time to be precise about the pronoun. I designed this thing, scoped it, and checked its layouts against a real COBOL compiler and a genuine 1990s mainframe file — but the .NET engine was written by an AI. Here's the honest shape of that collaboration.</p>
       <p class="byline">By Jonas Fiers · fifth in a series on PICASSO</p>
     </div>
 
     <article class="post">
 
-      <p>I flagged this at the end of the first post and I'd rather state it plainly than let it sit as an implication: I did not write the C# in PICASSO. The parser, the codec, the packed-decimal arithmetic, the EBCDIC table, the action classes — the implementation was written by an AI (Claude, from Anthropic) working under my direction. I set the problem and the scope, I made the calls about what's in and what's out, and I validated every layout it produced against real data. The typing of the code was not the part I did.</p>
+      <p>I flagged this at the end of the first post and I'd rather state it plainly than let it sit as an implication: I did not write the C# in PICASSO. The parser, the codec, the packed-decimal arithmetic, the EBCDIC table, the action classes — the implementation was written by an AI (Claude, from Anthropic) working under my direction. I set the problem and the scope, I made the calls about what's in and what's out, and I cross-checked its layouts against a real COBOL compiler and round-tripped a genuine 1990s mainframe file. The typing of the code was not the part I did.</p>
 
       <p>I think that division is genuinely interesting, and I think the interesting version is the accurate one — not "I built a COBOL parser" with an asterisk, and not "the AI built it while I watched," which is equally false. Let me describe what actually happened.</p>
 
@@ -79,7 +79,7 @@
 
       <p><strong>Deciding it was worth building at all.</strong> The whole origin of this project (<a class="inline" href="picasso-the-thing-that-should-exist.html">Part 1</a>) is a judgment: that a hand-transcribed byte layout in a toy expense app pointed at a real, unglamorous gap in the OutSystems ecosystem — a problem solved everywhere else, but not where I needed it, and not by any .NET tool I'd trust with a financial record. No model told me that was worth six blog posts of effort. Noticing which problems are worth solving is not a thing you can delegate, because it depends on knowing the domain you work in and what annoys the people in it.</p>
 
-      <p><strong>Setting the scope, and defending it.</strong> A copybook can contain a great deal, and the fastest way to never ship is to try to support all of it. The line — <code>DISPLAY</code>, COMP-3, binary <code>COMP</code>, EBCDIC cp037, fixed-count OCCURS, REDEFINES, single-level ODO <em>in</em>; hex-float <code>COMP-1</code>/<code>COMP-2</code>, DBCS, EBCDIC variants beyond cp037 explicitly <em>out</em> — is a series of deliberate calls about what real files actually contain versus what merely exists in the standard. Those calls are mine, and most of them are calls to <em>not</em> build something. Left to its own momentum, a capable code generator will happily implement the rare thing you'll never see in a real extract; someone has to keep saying "that's out of scope, and here's the named error it should throw instead."</p>
+      <p><strong>Setting the scope, and defending it.</strong> A copybook can contain a great deal, and the fastest way to never ship is to try to support all of it. The line — <code>DISPLAY</code>, COMP-3, binary <code>COMP</code>, EBCDIC cp037, fixed-count OCCURS, REDEFINES, flat (non-nested) ODO <em>in</em>; hex-float <code>COMP-1</code>/<code>COMP-2</code>, DBCS, EBCDIC variants beyond cp037 explicitly <em>out</em> — is a series of deliberate calls about what real files actually contain versus what merely exists in the standard. Those calls are mine, and most of them are calls to <em>not</em> build something. Left to its own momentum, a capable code generator will happily implement the rare thing you'll never see in a real extract; someone has to keep saying "that's out of scope, and here's the named error it should throw instead."</p>
 
       <div class="pull">
         <p>The AI's instinct is to make things work. Mine was to decide which things were worth making work — and which should fail loudly instead.</p>
