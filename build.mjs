@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * build.mjs — marker-region sync for the shared site chrome.
+ * build.mjs — marker-region sync for the shared site chrome, plus sitemap.xml.
  *
  * The site is hand-authored static HTML. The header (nav) and the slim blog
  * footer are identical chrome repeated across 8 pages. Rather than copy-paste
@@ -19,10 +19,14 @@
  * Styling for the chrome (and the whole site) lives in the single stylesheet
  * assets/site.css. This script only manages the HTML regions, not the CSS.
  *
+ * It also writes sitemap.xml from the same PAGE MANIFEST — see the SITEMAP
+ * section below for why.
+ *
  * Usage:  node build.mjs
  */
 
 import { readFile, writeFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -97,6 +101,67 @@ function faviconHTML(page) {
   return `<link rel="icon" type="image/svg+xml" href="${prefix}${file}">`;
 }
 
+/* ── SITEMAP ────────────────────────────────────────────────────────────────
+ * Generated from the SAME manifest as the chrome, so it cannot drift. The
+ * hand-maintained sitemap.xml had decayed to a single URL — the homepage —
+ * while the blog landing and six posts were live and unlisted, telling Google
+ * the site was one page.
+ *
+ * Origin is the www host: that is what <link rel="canonical"> and robots.txt
+ * both use, and the apex 301-redirects to it. A sitemap listing URLs on a
+ * different host than the one serving it is rejected.
+ *
+ * lastmod comes from each file's last git commit date — accurate, stable across
+ * checkouts, and with no second place to remember to update. If git is not
+ * available the element is omitted rather than guessed: Google ignores a
+ * lastmod it does not trust, and a wrong one is worse than none.
+ *
+ * changefreq and priority are deliberately absent. Google documents that it
+ * ignores both, and the old file's "monthly"/"1.0" were pure noise.
+ */
+const SITE_ORIGIN = 'https://www.jonasfiers.eu';
+
+function xmlEscape(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
+/* Directory-index pages are advertised at their directory URL, not the
+   index.html filename, so the sitemap matches the canonical form. */
+function urlFor(page) {
+  if (page.file === 'index.html') return `${SITE_ORIGIN}/`;
+  if (page.file === 'blog/index.html') return `${SITE_ORIGIN}/blog/`;
+  return `${SITE_ORIGIN}/${page.file}`;
+}
+
+function gitLastModified(file) {
+  try {
+    const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', file], {
+      cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(out) ? out : null;
+  } catch {
+    return null;
+  }
+}
+
+function sitemapXML(pages) {
+  const entries = pages.map((page) => {
+    const lastmod = gitLastModified(page.file);
+    return [
+      '  <url>',
+      `    <loc>${xmlEscape(urlFor(page))}</loc>`,
+      ...(lastmod ? [`    <lastmod>${lastmod}</lastmod>`] : []),
+      '  </url>',
+    ].join('\n');
+  });
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${entries.join('\n')}
+</urlset>
+`;
+}
+
 /* ── REGION SYNC ────────────────────────────────────────────────────────────*/
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -148,6 +213,22 @@ for (const page of PAGES) {
   } else {
     console.log(`in sync  ${page.file}`);
   }
+}
+
+/* Sitemap: written from the manifest above, so every page listed there is
+   advertised to search engines whether or not anyone remembers to do it. */
+const sitemapPath = join(ROOT, 'sitemap.xml');
+const sitemapNext = sitemapXML(PAGES);
+let sitemapPrev = '';
+try {
+  sitemapPrev = await readFile(sitemapPath, 'utf8');
+} catch { /* first run — no existing sitemap */ }
+
+if (sitemapNext !== sitemapPrev) {
+  await writeFile(sitemapPath, sitemapNext, 'utf8');
+  console.log(`updated  sitemap.xml (${PAGES.length} URLs)`);
+} else {
+  console.log(`in sync  sitemap.xml (${PAGES.length} URLs)`);
 }
 
 console.log(`\n${checked} page(s) checked, ${changed} updated.`);
