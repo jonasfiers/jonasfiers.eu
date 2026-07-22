@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy — Jonas Fiers</title>
+<meta name="description" content="What this site records, why, and for how long. No analytics, no tracking cookies, no third-party profiling — just server logs kept 30 days for security and troubleshooting.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.jonasfiers.eu/privacy.html">
+<link rel="canonical" href="https://www.jonasfiers.eu/privacy.html">
+<meta property="og:title" content="Privacy">
+<meta property="og:description" content="What this site records, why, and for how long. No analytics, no tracking cookies, no third-party profiling.">
+<meta property="og:image" content="https://www.jonasfiers.eu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Privacy">
+<meta name="twitter:description" content="What this site records, why, and for how long. No analytics, no tracking cookies, no third-party profiling.">
+<meta name="twitter:image" content="https://www.jonasfiers.eu/og-image.png">
+<!-- @@favicon@@ -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<!-- @@/favicon@@ -->
+<link rel="preload" href="fonts/CabinetGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<!-- @@header@@ -->
+<header class="site-header section-portfolio">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span>(:</span>Jonas Fiers<span>)</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="to-portfolio" href="index.html" aria-current="page">Portfolio</a>
+      <a class="to-writing" href="blog/index.html">Writing</a>
+    </nav>
+  </div>
+</header>
+<!-- @@/header@@ -->
+
+<main>
+  <div class="wrap">
+
+    <div class="article-head">
+      <p class="kicker">
+        <span>(:You)-[:VISITS]-&gt;(:ThisSite)</span>
+        <span class="muted">Updated 22 July 2026</span>
+      </p>
+      <h1>Privacy</h1>
+      <p class="standfirst">This is a personal site. It runs no analytics, sets no tracking cookies, and profiles nobody. The only thing it records is the web server's own access log — which is enough to be personal data, so here is exactly what that means.</p>
+    </div>
+
+    <article class="post">
+
+      <h2>What gets recorded</h2>
+      <p>Every request to this site is written to a standard web server access log. Each line contains:</p>
+      <ul>
+        <li>your IP address</li>
+        <li>the date and time of the request</li>
+        <li>the page or file requested, and the response status</li>
+        <li>the referring page, if your browser sent one</li>
+        <li>your browser's user-agent string</li>
+      </ul>
+      <p>That's the whole list. Nothing is added to it, and nothing is combined with data from anywhere else.</p>
+
+      <h2>Why an IP address counts</h2>
+      <p>Under the GDPR an IP address is personal data, including a dynamic one, because an internet provider could in principle link it back to a person. That makes this a privacy notice rather than a formality, even though the site itself is about as inert as a website gets.</p>
+
+      <h2>Why it's kept</h2>
+      <p>Security, abuse prevention, and troubleshooting. Logs are how you find out that something is broken, or that a bot is probing for vulnerabilities — which, for the record, happens to every public host continuously. The legal basis is legitimate interest under Article 6(1)(f).</p>
+
+      <h2>How long</h2>
+      <p><strong>30 days.</strong> Logs rotate daily and older ones are deleted automatically. There is no archive, no backup of them, and no long-term store.</p>
+
+      <h2>What this site does not do</h2>
+      <ul>
+        <li><strong>No analytics.</strong> No Google Analytics, no Plausible, no pixels, no beacons.</li>
+        <li><strong>No tracking cookies.</strong> The site sets no cookies of its own — you can check the response headers yourself.</li>
+        <li><strong>No third-party embeds</strong> that would report your visit elsewhere. Fonts are served from this domain, not a font CDN.</li>
+        <li><strong>No advertising, no data sharing, no selling.</strong> There is nobody to share it with.</li>
+      </ul>
+      <p>This is also why you are not being asked to dismiss a cookie banner. Consent banners exist because of the ePrivacy rules on storing or reading data <em>on your device</em>. This site does neither, so there is nothing to consent to.</p>
+
+      <h2>Who else sees the traffic</h2>
+      <p>The site sits behind <strong>Cloudflare</strong>, which serves it and shields the origin. Cloudflare therefore processes request data — including your IP — as a processor, under its own terms. It may set a <code>__cf_bm</code> cookie for bot detection; that is a security function rather than tracking, and it is Cloudflare's, not mine.</p>
+      <p>The server itself is self-hosted on a homelab machine. No other cloud provider is involved.</p>
+
+      <h2>Your rights</h2>
+      <p>You can ask what is held about you, ask for it to be deleted, or object to the processing. In practice, an IP address in a log is hard to tie to a person without more information than I have — so a request will usually need the IP and an approximate timestamp to find anything at all.</p>
+      <p>Email <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>. If you are not satisfied, you can complain to the Belgian Data Protection Authority (Gegevensbeschermingsautoriteit / Autorité de protection des données).</p>
+
+      <h2>Who is responsible</h2>
+      <p>Jonas Fiers, Belgium. Contact: <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>.</p>
+
+      <h2>Changes</h2>
+      <p>If what the site records ever changes, this page changes with it, and the date at the top moves. There is no changelog because there has been nothing to log.</p>
+
+    </article>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="back to-portfolio" href="index.html">&larr; Back to the portfolio</a>
+    <div class="contact-links">
+      <a href="mailto:hello@jonasfiers.eu">hello@jonasfiers.eu</a>
+      <a href="https://linkedin.com/in/jonasfiers" target="_blank" rel="noopener">linkedin.com/in/jonasfiers</a>
+      <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
+    </div>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) &mdash; self-hosted, no cloud provider involved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

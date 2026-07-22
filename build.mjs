@@ -42,6 +42,7 @@ const ROOT = dirname(fileURLToPath(import.meta.url));
  */
 const PAGES = [
   { file: 'index.html',                                      loc: 'root', section: 'portfolio', footer: 'none' },
+  { file: 'privacy.html',                                    loc: 'root', section: 'portfolio', footer: 'none' },
   { file: 'blog/index.html',                                 loc: 'blog', section: 'writing',   footer: 'landing' },
   { file: 'blog/picasso-the-thing-that-should-exist.html',   loc: 'blog', section: 'writing',   footer: 'post' },
   { file: 'blog/picasso-inside-a-copybook.html',             loc: 'blog', section: 'writing',   footer: 'post' },
@@ -77,6 +78,7 @@ function headerHTML(page) {
 }
 
 function footerHTML(page) {
+  const prefix = page.loc === 'root' ? '' : '../';
   const back = page.footer === 'landing'
     ? '<a class="back to-portfolio" href="../index.html">&larr; Back to the portfolio</a>'
     : '<a class="back to-writing" href="index.html">&larr; All writing</a>';
@@ -88,7 +90,7 @@ function footerHTML(page) {
       <a href="https://linkedin.com/in/jonasfiers" target="_blank" rel="noopener">linkedin.com/in/jonasfiers</a>
       <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
     </div>
-    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) &mdash; self-hosted, no cloud provider involved.</p>
+    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) &mdash; self-hosted, no cloud provider involved. &middot; <a href="${prefix}privacy.html">Privacy</a></p>
   </div>
 </footer>`;
 }
