@@ -8,6 +8,7 @@
  *
  *     <!-- @@header@@ --> ...header markup... <!-- @@/header@@ -->
  *     <!-- @@footer@@ --> ...footer markup... <!-- @@/footer@@ -->
+ *     <!-- @@fine@@ -->   ...fine-print line... <!-- @@/fine@@ -->
  *
  * This script regenerates the markup BETWEEN those markers from the single
  * generator functions below, per the PAGE MANIFEST, and writes the file back.
@@ -78,7 +79,6 @@ function headerHTML(page) {
 }
 
 function footerHTML(page) {
-  const prefix = page.loc === 'root' ? '' : '../';
   const back = page.footer === 'landing'
     ? '<a class="back to-portfolio" href="../index.html">&larr; Back to the portfolio</a>'
     : '<a class="back to-writing" href="index.html">&larr; All writing</a>';
@@ -90,9 +90,23 @@ function footerHTML(page) {
       <a href="https://linkedin.com/in/jonasfiers" target="_blank" rel="noopener">linkedin.com/in/jonasfiers</a>
       <a href="https://github.com/jonasfiers" target="_blank" rel="noopener">github.com/jonasfiers</a>
     </div>
-    <p class="fine">(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) &mdash; self-hosted, no cloud provider involved. &middot; <a href="${prefix}privacy.html">Privacy</a></p>
+    <p class="fine">${fineHTML(page)}</p>
   </div>
 </footer>`;
+}
+
+/* The fine-print line. It appears in three different wrappers - the blog footer,
+   the homepage's own contact block, and privacy.html's footer - so it lives here
+   rather than being hand-copied. Only the inner content is managed; each page
+   keeps its own <p> and styling.
+
+   "only the edge is rented" is deliberate: the origin really is a homelab LXC,
+   but Cloudflare terminates TLS and proxies every request, so claiming no cloud
+   provider is involved would contradict the privacy notice that names Cloudflare
+   as a processor. */
+function fineHTML(page) {
+  const prefix = page.loc === 'root' ? '' : '../';
+  return `(:ThisSite)-[:RUNS_ON]-&gt;(:HomelabProxmoxLXC) &mdash; self-hosted; only the edge is rented. &middot; <a href="${prefix}privacy.html">Privacy</a>`;
 }
 
 /* Per-section favicon: portfolio pages get the lime :JF, writing pages the pink
@@ -201,6 +215,11 @@ for (const page of PAGES) {
   const fav = syncRegion(html, 'favicon', faviconHTML(page));
   if (!fav.present) problems.push(`${page.file}: missing <!-- @@favicon@@ --> region`);
   html = fav.html;
+
+  /* Pages with their own footer markup (homepage, privacy) carry a standalone
+     @@fine@@ region instead; absent elsewhere, which is not a problem. */
+  const fine = syncRegion(html, 'fine', fineHTML(page));
+  html = fine.html;
 
   if (page.footer !== 'none') {
     const f = syncRegion(html, 'footer', footerHTML(page));
