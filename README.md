@@ -13,7 +13,7 @@ No framework and no dependencies — the homepage is one `index.html` linking a 
 - **`favicon.svg`**, **`fonts/`** — self-hosted assets, no external font/CDN requests
 - **`og-image.png`** / **`og-template.html`** — the social-share card; `og-template.html` is the editable source, see below for how to regenerate it
 - **`robots.txt`**, **`sitemap.xml`** — standard SEO plumbing
-- **`Jonas_Fiers_CV.pdf`** — linked from the hero's download button
+- **`Jonas_Fiers_CV.docx`** / **`Jonas_Fiers_CV.pdf`** — the CV; the `.docx` is the editable source and the `.pdf` is what the hero's download button serves, see below for how to regenerate it
 - **`google*.html`** — Google Search Console site-verification file (its content is meant to be public, that's how the verification works)
 
 ## Previewing locally
@@ -78,6 +78,45 @@ the pages in the repo are the deployed pages. Commit them after running the buil
   --screenshot="og-image.png" \
   "file://$(pwd)/og-template.html"
 ```
+
+## Regenerating the CV PDF
+
+`Jonas_Fiers_CV.docx` is the editable source; `Jonas_Fiers_CV.pdf` is a render of
+it, and the two are committed together. Edit the `.docx`, then:
+
+```bash
+soffice --headless --norestore --convert-to pdf --outdir . Jonas_Fiers_CV.docx
+```
+
+Two things are worth knowing before you run it.
+
+**Edit the copy in this repo.** The CV has drifted before — a `.docx` edited
+elsewhere left the repo copy two weeks stale, which meant the next change had to
+be reconstructed against a PDF rather than simply applied. If you edit the CV on
+another machine, bring that file back here rather than committing around it.
+
+**Generate on the same machine every time.** Identical content encodes
+differently across LibreOffice builds, so alternating machines produces large
+binary diffs that contain no actual change. Everything up to 2026-07-31 came from
+LibreOffice 26.2.4.2 on aarch64; from that date the PDF is generated on the amd64
+devbox (25.2.3), where `libreoffice-writer` and `fonts-liberation` are installed.
+Font substitution is the same on both — Liberation Sans standing in for Arial —
+so the switch was layout-neutral, but the encoding change makes one commit's
+binary diff misleadingly large.
+
+Verify a regeneration by diffing the extracted text against the committed PDF —
+only the lines you meant to touch should move, and it has to stay one page. The
+convert step overwrites the PDF in place, so pull the old one from git rather
+than from the working tree:
+
+```bash
+git show HEAD:Jonas_Fiers_CV.pdf | pdftotext -layout - /tmp/cv-old.txt
+pdftotext -layout Jonas_Fiers_CV.pdf /tmp/cv-new.txt
+diff /tmp/cv-old.txt /tmp/cv-new.txt
+pdfinfo Jonas_Fiers_CV.pdf | grep Pages
+```
+
+`build.mjs` does not touch the CV; this step is manual and deliberate.
 
 ## Deployment
 
